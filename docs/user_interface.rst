@@ -8,7 +8,7 @@ User Interface
     :depth: 3
 
 Under construction
-===============
+==================
 
 :program:`PyQInt` uses cartesian Gaussian type orbitals as given by
 

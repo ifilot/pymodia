@@ -1,5 +1,7 @@
 # PyMODIA
 
+![Build status](https://gitlab.tue.nl/inorganic-materials-chemistry/pymodia/master/pipeline.svg)
+
 ## Purpose
 
 PyMoDia is a python package designed for making SVG images of 
