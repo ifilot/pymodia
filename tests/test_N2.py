@@ -45,14 +45,14 @@ class TestH2(unittest.TestCase):
                             colors_ao1=ao_colors, colors_ao2=ao_colors)
         diagram.draw_occupancies()
         diagram.draw_contributions(contribution_cutoff)
-        diagram.image.save_svg(os.path.join('tests', 'N2_test_results.svg'))
+        diagram.image.save_svg(os.path.join('tests', 'n2_test_results.svg'))
 
     def test_H2_svg(self):
         """
         Compares the test SVG with the reference SVG
         """
-        ref_svg = os.path.join('tests', 'N2_test_ref.svg')
-        test_svg = os.path.join('tests', 'N2_test_results.svg')
+        ref_svg = os.path.join('tests', 'reference', 'n2_test_ref.svg')
+        test_svg = os.path.join('tests', 'n2_test_results.svg')
 
         self.assertTrue(filecmp.cmp(test_svg, ref_svg))
 
@@ -61,8 +61,7 @@ class TestH2(unittest.TestCase):
         """
         Removes the test SVG
         """
-        os.remove(os.path.join('tests', 'N2_test_results.svg'))
-
+        os.remove(os.path.join('tests', 'n2_test_results.svg'))
 
 if __name__ == '__main__':
     unittest.main()

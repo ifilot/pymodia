@@ -48,6 +48,5 @@ class TestH2(unittest.TestCase):
         self.assertEqual(CH4.a1, C6H6.a1)
         self.assertEqual(CH4.a2, C6H6.a2)
 
-
 if __name__ == '__main__':
     unittest.main()

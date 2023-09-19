@@ -14,5 +14,12 @@ debian-test:
   script: # explicitly write out all cases to run
     - pytest tests/*.py
 
-# documentation:
-#   stage: staging
+documentation:
+  stage: staging
+  image: ghcr.io/ifilot/sphinx:v0.4.0 # custom Sphinx image
+  script:
+    - pushd docs && make html && popd
+  artifacts:
+    paths:
+      - docs/build/html/
+    expire_in: 1 hour
