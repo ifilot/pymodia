@@ -1,4 +1,0 @@
-name: pymodia
-dependencies:
-  - numpy
-  - drawsvg

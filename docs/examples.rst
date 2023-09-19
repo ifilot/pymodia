@@ -7,8 +7,8 @@ Examples
 A series of typical usage scenarios are given, including the result and the
 source code.
 
-Qualatative MO diagram
-===========================
+Qualitative MO diagram
+======================
 
 One can easily make their own MO diagram without the need of doing electronic structure calculations.
 
@@ -59,8 +59,8 @@ One can easily make their own MO diagram without the need of doing electronic st
 .. figure:: _static/img/MO_diagram_N2.svg
    :alt: Qualatative MO diagram of N2 with custom colors
    
-Quantatative MO diagram
-===========================
+Quantitative MO diagram
+=======================
 
 By making use of electronic structure calculation packages like `PyQInt <https://github.com/ifilot/pyqint>` more representable number can be given to the diagram.
 Some rounding might be neccesary to make sure degenerate levels have the (exact) same energy. 
@@ -110,10 +110,10 @@ Some rounding might be neccesary to make sure degenerate levels have the (exact)
 	diagram.image.save_svg("MO_diagram_H2.svg")
 
 .. figure:: _static/img/MO_diagram_H2.svg
-   :alt: Quantatative MO diagram of H2
+   :alt: Quantitative MO diagram of H2
    
 Customizability 
-===========================
+===============
 
 There is a wide range of colors lengths and sizes that can be changed some examples are shown below.
 The example below shows how one could make a 'dark mode' MO diagram.
