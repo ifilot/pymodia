@@ -12,7 +12,7 @@ class PyMoDia():
                  margin=50, core_height=50, outer_height=400, level_width=55,
                  line_width=1.5, multiplicty_offset=3, font_family='Noto Sans',
                  font_size=10, main_color='#000000', draw_background=True,
-                 background_color='#ffffff'):
+                 background_color='#ffffff', mo_round=5):
         self.core_cutoff = core_cutoff
         self.width = width
         self.height = height
@@ -31,7 +31,6 @@ class PyMoDia():
         self.molecule = molecule
         self.atom1 = molecule.a1
         self.atom2 = molecule.a2
-        self.moe = molecular_orbital_energies
         self.orbc = np.transpose(orbital_coefficients)
 
         self.image = draw.Drawing(self.width, self.height)
@@ -41,6 +40,9 @@ class PyMoDia():
         if self.draw_background is True:
             self.image.append(draw.Rectangle(0, 0, self.width, self.height,
                                              fill=self.background_color))
+
+        # rounding MO energies
+        self.moe = np.round(molecular_orbital_energies, mo_round)
 
         def find_core(self, core_cutoff):
             """
