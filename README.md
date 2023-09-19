@@ -21,6 +21,11 @@ at https://pymodia.imc-tue.nl.
 
 ## Installation
 
+### Dependencies
+
+* [NumPy](https://numpy.org/)
+* [Drawsvg](https://github.com/cduck/drawsvg)
+
 ### PyPi
 
 To be written

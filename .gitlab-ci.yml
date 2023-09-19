@@ -7,10 +7,10 @@ stages:
 debian-test:
   stage: test
   before_script:
-    - apt update && apt -y install python3 python3-full # install packages
+    - apt update && apt -y install python3-full         # install Python
     - python3 -m venv /venv                             # create a virtual environment
     - source /venv/bin/activate                         # activate virtual environment
-    - pip install drawsvg nose                          # install required packages
+    - pip install drawsvg nose numpy                    # install required packages
   script: # explicitly write out all cases to run
     - nosetests tests/*.py
 
