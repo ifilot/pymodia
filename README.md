@@ -1,6 +1,6 @@
 # PyMODIA
 
-![Build status](https://gitlab.tue.nl/inorganic-materials-chemistry/pymodia/master/pipeline.svg)
+![Build status](https://gitlab.tue.nl/inorganic-materials-chemistry/pymodia/badges/master/pipeline.svg)
 
 ## Purpose
 
