@@ -1,0 +1,55 @@
+name: deploy
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+#-------------------------------------------------------------------------------
+# PyPI / Linux
+#-------------------------------------------------------------------------------
+  build-pypi-linux:
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_x86_64
+
+    steps:
+    - name: Install dependencies
+      run: |
+        yum -y install eigen3-devel libgomp boost-devel mlocate gcc
+        /opt/python/cp37-cp37m/bin/python -m pip install numpy pytest drawsvg
+        /opt/python/cp38-cp38/bin/python -m pip install numpy pytest drawsvg
+        /opt/python/cp39-cp39/bin/python -m pip install numpy pytest drawsvg
+        /opt/python/cp310-cp310/bin/python -m pip install numpy pytest drawsvg
+        /opt/python/cp311-cp311/bin/python -m pip install numpy pytest drawsvg
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Build
+      run: ./deploy/docker_setup_github.sh
+    - name: Test
+      run: ./deploy/docker_test_github.sh
+    - name: Archive wheels
+      uses: actions/upload-artifact@v3
+      with:
+        name: pypi-linux-wheels
+        path: wheelhouse/pymodia-*.whl
+
+  publish-pypi-linux:
+    name: Upload release to PyPI
+    needs: build-pypi-linux
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pymodia
+    permissions:
+      id-token: write
+    steps:
+    - name: Retrieve packages
+      uses: actions/download-artifact@v3
+      with:
+        name: pypi-linux-wheels
+        path: wheelhouse
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: wheelhouse/
