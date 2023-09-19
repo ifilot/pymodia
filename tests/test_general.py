@@ -1,6 +1,11 @@
 import unittest
-from pymodia import Atom, Molecule, subscript
+import os
+import sys
 
+# add a reference to load the PPMIL library
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from pymodia import Atom, Molecule, subscript
 
 class TestH2(unittest.TestCase):
 
