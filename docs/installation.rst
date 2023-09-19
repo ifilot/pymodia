@@ -7,7 +7,8 @@ Installation
 Dependencies
 ------------
 
-To be written
+* `NumPy <https://numpy.org/>`_
+* `Drawsvg <https://github.com/cduck/drawsvg>`_
 
 PyPI
 ----
