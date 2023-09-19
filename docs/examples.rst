@@ -54,10 +54,6 @@ One can easily make their own MO diagram without the need of doing electronic st
 	
 	# Save image
 	diagram.image.save_svg("MO_diagram_N2.svg")
-
-
-.. figure:: _static/img/mo_diagram_n2.svg
-   :alt: Qualitative MO diagram of N2 with custom colors
    
 Quantitative MO diagram
 =======================
@@ -108,9 +104,6 @@ Some rounding might be necessary to make sure degenerate levels have the (exact)
 	
 	# Save image
 	diagram.image.save_svg("MO_diagram_H2.svg")
-
-.. figure:: _static/img/mo_diagram_h2.svg
-   :alt: Quantitative MO diagram of H2
    
 Customizability 
 ===============
@@ -165,8 +158,5 @@ The example below shows how one could make a 'dark mode' MO diagram.
 	
 	# Save image
 	diagram.image.save_svg("mo_diagram_ch4.svg")
-
-.. figure:: _static/img/mo_diagram_ch4.svg
-   :alt: Quantitative MO diagram of CH4
    
  
