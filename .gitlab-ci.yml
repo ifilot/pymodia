@@ -42,6 +42,9 @@ documentation:
 
 pages:
   needs: ["documentation"]
+  only:
+    refs:
+      - master
   script:
     - cp -rv docs/_build/html/ public
   dependencies:
