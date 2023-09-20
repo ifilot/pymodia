@@ -11,15 +11,14 @@ debian-test:
 
 anaconda-compilation-test:
   needs: ["debian-test"]
-  image: continuumio/miniconda3
+  image: conda/miniconda3
   before_script:
     - conda install -y conda-build
-    - conda config --add channels conda-forge
   script:
-    - set -m # enable job control
-    - conda build .
+    - mkdir conda-bld
+    - conda build . -c conda-forge --output-folder conda-bld/
 
-pypi-compilation-test:
+pypi-compilation:
   needs: ["debian-test"]
   image: quay.io/pypa/manylinux2014_x86_64
   before_script:
@@ -28,6 +27,9 @@ pypi-compilation-test:
     - /opt/python/cp39*/bin/python setup.py bdist_wheel
     - /opt/python/cp39-cp39/bin/pip install pymodia --no-index -f ./dist
     - /opt/python/cp39-cp39/bin/pytest --verbose tests
+  artifacts:
+    paths:
+      - dist/pymodia-*.whl
 
 documentation:
   image: ghcr.io/ifilot/sphinx:v0.4.0 # custom Sphinx image
