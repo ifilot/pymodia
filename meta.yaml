@@ -1,0 +1,45 @@
+package:
+  name: "pymodia"
+  version: "0.1.0"
+
+source:
+  path: .
+
+build:
+  include_recipe: False
+  noarch: python
+
+requirements:
+  build:
+    - numpy>=1.21
+    - python>=3.9
+
+  host:
+    - pip
+    - python>=3.9
+    - setuptools
+    - numpy>=1.21
+
+  run:
+    - python>=3.9
+    - numpy>=1.21
+    - drawsvg>=2.3
+
+test:
+  requires:
+    - numpy
+    - setuptools
+    - pytest
+    - drawsvg>=2.3
+  source_files:
+    - tests/*.py
+    - tests/reference/*.svg
+  commands:
+    - pytest tests/
+
+about:
+  home: https://github.com/ifilot/pymodia
+  license: GPL3
+  license_family: GPL
+  summary: Python package for constructing MO diagrams
+  description: See the package README.md for more information.
