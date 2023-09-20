@@ -23,14 +23,14 @@ requirements:
   run:
     - python>=3.9
     - numpy>=1.21
-    - drawsvg>=2.3
+    - drawsvg>=2.0
 
 test:
   requires:
     - numpy
     - setuptools
     - pytest
-    - drawsvg>=2.3
+    - drawsvg>=2.0
   source_files:
     - tests/*.py
     - tests/reference/*.svg
