@@ -39,3 +39,13 @@ documentation:
     paths:
       - docs/_build/html/
     expire_in: 1 hour
+
+documentation-deploy:
+  needs: ["documentation"]
+  script:
+    - cp -rv docs/_build/html/ public
+  dependencies:
+    - documentation
+  artifacts:
+    paths:
+      - public
