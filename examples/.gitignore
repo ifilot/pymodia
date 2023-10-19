@@ -1,0 +1,3 @@
+# do not store the MO diagrams themselves
+*.svg
+*.SVG

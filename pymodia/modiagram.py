@@ -277,6 +277,7 @@ class PyMoDia():
             """
             Draws energy levels based on a location library and colors
             """
+            
             if len(colors) == 1:
                 for j in range(len(loc_dict['xb'])):
                     self.image.append(draw.Line(loc_dict['xb'][j],
@@ -286,6 +287,9 @@ class PyMoDia():
                                                 stroke=colors[0],
                                                 stroke_width=self.line_width))
             else:
+                if len(colors) < len(loc_dict['xb']):
+                    raise Exception("Insufficient colors specified. Need at least %i colors." % len(loc_dict['xb']))
+
                 for j in range(len(loc_dict['xb'])):
                     self.image.append(draw.Line(loc_dict['xb'][j],
                                                 loc_dict['ymb'][j],
