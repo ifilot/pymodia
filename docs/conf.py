@@ -58,7 +58,7 @@ html_static_path = ['_static']
 #     'display_version': True,
 #     'analytics_id': 'G-H71EPP6GVB'
 # }
-html_logo = "_static/img/icon.svg"
+html_logo = "_static/img/banner.svg"
 html_favicon = "_static/img/simple_icon.ico"
 html_css_files = [
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
@@ -66,6 +66,7 @@ html_css_files = [
 
 # other options
 html_show_sourcelink = False
+pygments_style = 'sphinx'
 
 def setup(app):
    app.add_css_file('css/custom.css')
