@@ -19,10 +19,6 @@ res = pyqint.HF().rhf(mol, basis='sto3g')
 mo_energies = res['orbe']
 orbc = np.round(res['orbc'], 3)
 
-# Using Fock matrix diagonal for atomic orbital energy proxy
-F = res['fock']
-diag = np.diagonal(F).tolist()
-
 # Setting up PyMoDia objects
 C = Atom("C")
 O = Atom("O")

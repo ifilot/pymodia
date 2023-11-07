@@ -34,7 +34,7 @@ molname = subscript("CH4")
 Mol = Molecule(molname, C, 1, H, 4)
 
 # Setting for the diagram
-core_cutoff = -5
+core_cutoff = -2
 contribution_cutoff = 0.25
 
 # Change canvas dimensions
@@ -47,7 +47,7 @@ core = "#000000"
 sigma = "#1aa7ec"
 pi = "#ff751f"
 mo_colors = [core, core, pi, pi, pi,
-             sigma, pi, pi, pi]
+              sigma, pi, pi, pi]
 
 # use distinct colors for the atomic orbitals
 ao_colors_carbon = [core, sigma, pi, pi, pi]

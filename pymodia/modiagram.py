@@ -67,10 +67,11 @@ class PyMoDia():
             Finds the locations of the energy levels
             """
             # Finding lowest core orbital
-            lwst_mo_c = min(mo_core)
-            lwst_ao1_c = min(ao1_core)
-            lwst_ao2_c = min(ao2_core)
-            lwst_outer_c = min([lwst_mo_c,lwst_ao1_c,lwst_ao2_c])
+            if len(mo_core) == 1:
+                lwst_mo_c = min(mo_core)
+                lwst_ao1_c = min(ao1_core)
+                lwst_ao2_c = min(ao2_core)
+                lwst_outer_c = min([lwst_mo_c,lwst_ao1_c,lwst_ao2_c])
             
             # Finding lowest outer orbital
             lwst_mo_o = min(mo_outer)
