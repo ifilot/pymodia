@@ -16,7 +16,12 @@ cgfs, atoms = mol.build_basis('sto3g')
 res = pyqint.HF().rhf(mol, basis='sto3g')
 
 # Rounding PyQInt results for PyMoDia
+mo_energies = res['orbe']
 orbc = np.round(res['orbc'], 3)
+
+# Using Fock matrix diagonal for atomic orbital energy proxy
+F = res['fock']
+diag = np.diagonal(F).tolist()
 
 # Setting up PyMoDia objects
 C = Atom("C")
@@ -29,8 +34,8 @@ core_cutoff = -2
 contribution_cutoff = 0.25
 
 # Change canvas dimensions
-outer_height = 300                      # height for the valence electrons
-core_height = 80                        # height for the core electrons box
+outer_height = 400                      # height for the valence electrons
+core_height = 60                        # height for the core electrons box
 height = outer_height+core_height+150   # total height of image
 
 # use distinct colors for core, sigma and pi orbitals in this diagram

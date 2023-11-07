@@ -12,7 +12,7 @@ class PyMoDia():
                  margin=50, core_height=50, outer_height=400, level_width=55,
                  line_width=1.5, multiplicty_offset=3, font_family='Noto Sans',
                  font_size=10, main_color='#000000', draw_background=True,
-                 background_color='#ffffff', mo_round=5):
+                 background_color='#ffffff', mo_round=5, ao_round=5):
         self.core_cutoff = core_cutoff
         self.width = width
         self.height = height
@@ -41,8 +41,10 @@ class PyMoDia():
             self.image.append(draw.Rectangle(0, 0, self.width, self.height,
                                              fill=self.background_color))
 
-        # rounding MO energies
-        self.moe = np.round(molecular_orbital_energies, mo_round)
+        # rounding orbital energies
+        self.moe = np.round(molecular_orbital_energies, mo_round).tolist()
+        self.atom1.energies = np.round(molecule.a1.energies, ao_round).tolist()
+        self.atom2.energies = np.round(molecule.a2.energies, ao_round).tolist()
 
         def find_core(self, core_cutoff):
             """
@@ -64,6 +66,19 @@ class PyMoDia():
             """
             Finds the locations of the energy levels
             """
+            # Finding lowest core orbital
+            lwst_mo_c = min(mo_core)
+            lwst_ao1_c = min(ao1_core)
+            lwst_ao2_c = min(ao2_core)
+            lwst_outer_c = min([lwst_mo_c,lwst_ao1_c,lwst_ao2_c])
+            
+            # Finding lowest outer orbital
+            lwst_mo_o = min(mo_outer)
+            lwst_ao1_o = min(ao1_outer)
+            lwst_ao2_o = min(ao2_outer)
+            lwst_outer_o = min([lwst_mo_o,lwst_ao1_o,lwst_ao2_o])
+            
+            
             # Finding locations of outer levels
             height_0_outer = self.outer_height + self.margin
             height_0_core = (self.core_height + self.outer_height +
@@ -71,7 +86,7 @@ class PyMoDia():
 
             # reordering (ro) and scaling (s) orbital levels
             # Molecular orbitals
-            ro_mo_outer = [x+abs(min(mo_outer)) for x in mo_outer]
+            ro_mo_outer = [x+abs(lwst_outer_o) for x in mo_outer]
             s_mo_outer = [x/(max(ro_mo_outer)) *
                           self.outer_height for x in ro_mo_outer]
             if len(mo_core) == 1:
@@ -79,13 +94,13 @@ class PyMoDia():
                 s_mo_core = [x/(max(ro_mo_core))*0.5 *
                              self.core_height for x in ro_mo_core]
             else:
-                ro_mo_core = [x+abs(min(mo_core)) for x in mo_core]
+                ro_mo_core = [x+abs(lwst_outer_c) for x in mo_core]
                 s_mo_core = [x/(max(ro_mo_core)) *
                              self.core_height for x in ro_mo_core]
 
             # Atomic orbitals
             # Atomic orbital 1
-            ro_ao1_outer = [x+abs(min(mo_outer)) for x in ao1_outer]
+            ro_ao1_outer = [x+abs(lwst_outer_o) for x in ao1_outer]
             s_ao1_outer = [x/(max(ro_mo_outer)) *
                            self.outer_height for x in ro_ao1_outer]
             if len(mo_core) == 1:
@@ -93,7 +108,7 @@ class PyMoDia():
                 s_ao1_core = [x/(max(ro_mo_core))*0.5 *
                               self.core_height for x in ro_ao1_core]
             else:
-                ro_ao1_core = [x+abs(min(mo_core)) for x in ao1_core]
+                ro_ao1_core = [x+abs(lwst_outer_c) for x in ao1_core]
                 s_ao1_core = [x/(max(ro_mo_core)) *
                               self.core_height for x in ro_ao1_core]
 
@@ -102,7 +117,7 @@ class PyMoDia():
                 s_ao1_outer = s_ao1_outer*self.molecule.nr_a1
 
             # Atomic orbital 2
-            ro_ao2_outer = [x+abs(min(mo_outer)) for x in ao2_outer]
+            ro_ao2_outer = [x+abs(lwst_outer_o) for x in ao2_outer]
             s_ao2_outer = [x/(max(ro_mo_outer)) *
                            self.outer_height for x in ro_ao2_outer]
             if len(mo_core) == 1:
@@ -110,7 +125,7 @@ class PyMoDia():
                 s_ao2_core = [x/(max(ro_mo_core))*0.5 *
                               self.core_height for x in ro_ao2_core]
             else:
-                ro_ao2_core = [x+abs(min(mo_core)) for x in ao2_core]
+                ro_ao2_core = [x+abs(lwst_outer_c) for x in ao2_core]
                 s_ao2_core = [x/(max(ro_mo_core)) *
                               self.core_height for x in ro_ao2_core]
 
@@ -398,7 +413,10 @@ class PyMoDia():
                                         stroke=color, marker_end=arrow))
 
         def draw_occupancy(self, level_loc_x, level_loc_y, nr_elec, nr_levels):
-            if nr_elec == 2*nr_levels:
+            if nr_elec <= 0:
+                # do nothing
+                pass
+            elif nr_elec == 2*nr_levels:
                 # sets of fully filled levels
                 if nr_levels == 1:
                     draw_arrow_set(self, level_loc_x, level_loc_y)
@@ -514,10 +532,9 @@ class PyMoDia():
                  (self.mo_loc['yme'][e]-0.5*self.multiplicty_offset))):
                 if mo_e_count >= 2*nr_levels:
                     nr_e = 2*nr_levels
-
                 else:
                     nr_e = mo_e_count
-
+                
                 draw_occupancy(self, (0.5*self.width+0.5*self.margin),
                                self.mo_loc['ye'][e], nr_e, nr_levels)
                 mo_e_count = mo_e_count - nr_e
@@ -762,7 +779,7 @@ class PyMoDia():
                                                     loc_dict['yb'][j], x+1,
                                                     loc_dict['yb'][j],
                                                     stroke=self.color))
-
+                        
         if style == 'mo':
             if isinstance(labels, list) or isinstance(labels, np.ndarray):
                 draw_energy_labels(self, self.mo_loc, labels, core=True)
@@ -774,14 +791,30 @@ class PyMoDia():
                 draw_energy_labels(self, self.ao1_loc, labels[1])
                 draw_energy_labels(self, self.ao2_loc, labels[2])
             else:
+                if self.molecule.nr_a1 > 1:
+                    atom1_energies = self.atom1.energies*self.molecule.nr_a1
+                else:
+                    atom1_energies = self.atom1.energies
+                if self.molecule.nr_a2 > 1:
+                    atom2_energies = self.atom2.energies*self.molecule.nr_a2
+                else:
+                    atom2_energies = self.atom2.energies
                 draw_energy_labels(self, self.mo_loc, self.moe, core=True)
-                draw_energy_labels(self, self.ao1_loc, self.atom1.energies)
-                draw_energy_labels(self, self.ao2_loc, self.atom2.energies)
+                draw_energy_labels(self, self.ao1_loc, atom1_energies)
+                draw_energy_labels(self, self.ao2_loc, atom2_energies)
         elif style == 'ao':
             if isinstance(labels, list) or isinstance(labels, np.ndarray):
                 draw_energy_labels(self, self.ao1_loc, labels[0], core=True)
                 draw_energy_labels(self, self.ao2_loc, labels[1], core=True)
             else:
+                if self.molecule.nr_a1 > 1:
+                    atom1_energies = self.atom1.energies*self.molecule.nr_a1
+                else:
+                    atom1_energies = self.atom1.energies
+                if self.molecule.nr_a2 > 1:
+                    atom2_energies = self.atom2.energies*self.molecule.nr_a2
+                else:
+                    atom2_energies = self.atom2.energies
                 draw_energy_labels(self, self.ao1_loc,
                                    self.atom1.energies, core=True)
                 draw_energy_labels(self, self.ao2_loc,
