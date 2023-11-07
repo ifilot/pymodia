@@ -67,17 +67,17 @@ class PyMoDia():
             Finds the locations of the energy levels
             """
             # Finding lowest core orbital
-            if len(mo_core) == 1:
+            if len(mo_core) >= 1:
                 lwst_mo_c = min(mo_core)
                 lwst_ao1_c = min(ao1_core)
                 lwst_ao2_c = min(ao2_core)
-                lwst_outer_c = min([lwst_mo_c,lwst_ao1_c,lwst_ao2_c])
-            
+                lwst_core = min([lwst_mo_c,lwst_ao1_c,lwst_ao2_c])
+                
             # Finding lowest outer orbital
             lwst_mo_o = min(mo_outer)
             lwst_ao1_o = min(ao1_outer)
             lwst_ao2_o = min(ao2_outer)
-            lwst_outer_o = min([lwst_mo_o,lwst_ao1_o,lwst_ao2_o])
+            lwst_outer = min([lwst_mo_o,lwst_ao1_o,lwst_ao2_o])
             
             
             # Finding locations of outer levels
@@ -87,7 +87,7 @@ class PyMoDia():
 
             # reordering (ro) and scaling (s) orbital levels
             # Molecular orbitals
-            ro_mo_outer = [x+abs(lwst_outer_o) for x in mo_outer]
+            ro_mo_outer = [x+abs(lwst_outer) for x in mo_outer]
             s_mo_outer = [x/(max(ro_mo_outer)) *
                           self.outer_height for x in ro_mo_outer]
             if len(mo_core) == 1:
@@ -95,13 +95,13 @@ class PyMoDia():
                 s_mo_core = [x/(max(ro_mo_core))*0.5 *
                              self.core_height for x in ro_mo_core]
             else:
-                ro_mo_core = [x+abs(lwst_outer_c) for x in mo_core]
+                ro_mo_core = [x+abs(lwst_core) for x in mo_core]
                 s_mo_core = [x/(max(ro_mo_core)) *
                              self.core_height for x in ro_mo_core]
 
             # Atomic orbitals
             # Atomic orbital 1
-            ro_ao1_outer = [x+abs(lwst_outer_o) for x in ao1_outer]
+            ro_ao1_outer = [x+abs(lwst_outer) for x in ao1_outer]
             s_ao1_outer = [x/(max(ro_mo_outer)) *
                            self.outer_height for x in ro_ao1_outer]
             if len(mo_core) == 1:
@@ -109,7 +109,7 @@ class PyMoDia():
                 s_ao1_core = [x/(max(ro_mo_core))*0.5 *
                               self.core_height for x in ro_ao1_core]
             else:
-                ro_ao1_core = [x+abs(lwst_outer_c) for x in ao1_core]
+                ro_ao1_core = [x+abs(lwst_core) for x in ao1_core]
                 s_ao1_core = [x/(max(ro_mo_core)) *
                               self.core_height for x in ro_ao1_core]
 
@@ -118,7 +118,7 @@ class PyMoDia():
                 s_ao1_outer = s_ao1_outer*self.molecule.nr_a1
 
             # Atomic orbital 2
-            ro_ao2_outer = [x+abs(lwst_outer_o) for x in ao2_outer]
+            ro_ao2_outer = [x+abs(lwst_outer) for x in ao2_outer]
             s_ao2_outer = [x/(max(ro_mo_outer)) *
                            self.outer_height for x in ro_ao2_outer]
             if len(mo_core) == 1:
@@ -126,7 +126,7 @@ class PyMoDia():
                 s_ao2_core = [x/(max(ro_mo_core))*0.5 *
                               self.core_height for x in ro_ao2_core]
             else:
-                ro_ao2_core = [x+abs(lwst_outer_c) for x in ao2_core]
+                ro_ao2_core = [x+abs(lwst_core) for x in ao2_core]
                 s_ao2_core = [x/(max(ro_mo_core)) *
                               self.core_height for x in ro_ao2_core]
 
