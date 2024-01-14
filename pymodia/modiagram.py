@@ -1,95 +1,64 @@
 import drawsvg as draw
 import numpy as np
+from . import MoDiaSettings, MoDiaStyle
 
 
-class PyMoDia():
+class MoDia():
     """
     Class to draw Molecular Orbital diagrams
     """
 
-    def __init__(self, data: modiadata = None, settings: modiasettings = None,
-                 style: modiastyle = None):
+    def __init__(self, data, **kwargs):
 
         # import data object
         if data:
             self.data = data
 
         # import settings object
-        if settings:
-            self.settings = settings
+        if 'settings' in kwargs:
+            self.settings = kwargs['settings']
+        else:
+            self.settings = MoDiaSettings()
+
+        # changing settings via kwargs
+        allowed_settings = {'core_cutoff', 'orbc_cutoff', 'width', 'height',
+                            'core_height', 'outer_height', 'margin',
+                            'level_width', 'line_width', 'multiplicity_offset',
+                            'mo_round', 'ao_round', 'draw_background',
+                            'draw_core_box', 'draw_occupancies',
+                            'draw_energy_labels', 'draw_level_labels',
+                            'draw_configuration', 'draw_orbc',
+                            'energy_scale_style', 'energy_scale_labels',
+                            'unit', 'label_significant_digits'}
+        self.settings.__dict__.update((k, v) for k, v in kwargs.items()
+                                      if k in allowed_settings)
 
         # import style object
-        if style:
-            self.style = style
+        if 'style' in kwargs:
+            self.style = kwargs['style']
+        else:
+            self.style = MoDiaStyle()
 
-        molecular_orbital_energies,
+        # changing style via kwargs
+        allowed_style = {'font_size', 'font_family', 'arrow_length', 'x_space',
+                         'x_space_interset', 'orbc_opacity',
+                         'orbc_linestyle', 'orbc_font_size',
+                         'arrow_head_size', 'background_color',
+                         'main_color', 'name_color', 'arrow_color',
+                         'orbc_color', 'box_color', 'energy_scale_color',
+                         'mo_color', 'ao1_color', 'ao2_color',
+                         'level_labels_style', 'mo_labels', 'ao1_labels',
+                         'ao2_labels'}
+        self.style.__dict__.update((k, v) for k, v in kwargs.items()
+                                   if k in allowed_style)
 
-        orbital_coefficients,
-
-        font_size = 10
-        main_color = '#000000'
-
-        mo_round = 5
-        ao_round = 5
-
-        self.core_cutoff = core_cutoff
-        self.width = width
-        self.height = height
-        self.margin = margin
-        self.core_height = core_height
-        self.outer_height = outer_height
-        self.level_width = level_width
-        self.line_width = line_width
-        self.multiplicty_offset = multiplicty_offset
-        self.font_family = font_family
-        self.font_size = font_size
-        self.color = main_color
-        self.draw_background = draw_background
-        self.background_color = background_color
-
-        self.molecule = molecule
-        self.atom1 = molecule.a1
-        self.atom2 = molecule.a2
-        self.orbc = np.transpose(orbital_coefficients)
-
-        # _______________________________ #
-
-        self.data.moe
-        self.data.name
-        self.data.atom1.name
-        self.data.atom2.name
-        self.data.atom1.e
-        self.data.atom2.e
-        self.data.atom1.nr
-        self.data.atom2.nr
-
-        self.settings.core_cutoff = -10
-        self.settings.width = 550
-        self.settings.height = 600
-        self.settings.core_height = 50
-        self.settings.outer_height = 400
-        self.settings.margin = 50
-        self.settings.level_width = 55
-        self.settings.line_width = 55
-        self.settings.multiplicty_offset = 3
-        self.settings.draw_background = True
-        self.settings.draw_core_box = True
-        self.settings.draw_occupancies = True
-        self.settings.draw_energy_labels = True
-        self.settings.draw_level_labels = False
-
-        self.style.main_color = "#000000"
-        self.style.font_family = "Noto Sans"
-        self.style.background_color = "#ffffff"
-        self.style.name_color = "#000000"  # name of atoms and molecule
-        self.style.arrow_color = "#000000"
-        self.style.arrow_length = 15
-        self.style.x_space = 12
-        self.style.x_space_interset = 2
-
-        self.style.mo_color = [self.style.main_color]
-        self.style.ao2_color = [self.style.main_color]
-        self.style.ao2_color = [self.style.main_color]
+        # rounding energies
+        self.data.moe = [round(moe, self.settings.mo_round) for moe
+                         in self.data.moe]
+        self.data.atom1.e = [round(e, self.settings.ao_round) for e
+                             in self.data.atom1.e]
+        self.data.atom2.e = [round(e, self.settings.ao_round) for e
+                             in self.data.atom2.e]
 
     def draw(self):
         """
@@ -99,7 +68,7 @@ class PyMoDia():
         # initialise image
         self.image = draw.Drawing(self.settings.width, self.settings.height)
 
-        # embed from google
+        # embed font from google
         self.image.embed_google_font(self.style.font_family)
 
         # add background
@@ -117,17 +86,21 @@ class PyMoDia():
 
         # adding atom/molecule information at bottom diagram
         self.__draw_names()
-        self.__draw_configuration()
+        if self.settings.draw_configuration:
+            self.__draw_configuration()
 
         # add box around core orbitals
         if self.settings.draw_core_box:
             self.__draw_box()
 
         # add occupancies to drawn levels
-        if self.settings.draw_occupancies:
-            self.__draw_occupancies()
+        self.__draw_occupancies()
 
-        # add energy
+        # draw orbc lines:
+        if self.settings.draw_orbc:
+            self.__draw_contributions()
+
+        # add energy labels
         if self.settings.draw_energy_labels:
             self.__draw_energy_scale()
             self.__draw_energy_labels()
@@ -195,10 +168,18 @@ class PyMoDia():
 
         # Finding lowest core orbital
         if len(mo_core) >= 1:
-            lwst_mo_c = min(mo_core)
-            lwst_ao1_c = min(ao1_core)
-            lwst_ao2_c = min(ao2_core)
-            lwst_core = min([lwst_mo_c, lwst_ao1_c, lwst_ao2_c])
+            lwst = []
+            if mo_core:
+                lwst_mo_c = min(mo_core)
+                lwst.append(lwst_mo_c)
+            if ao1_core:
+                lwst_ao1_c = min(ao1_core)
+                lwst.append(lwst_ao1_c)
+            if ao2_core:
+                lwst_ao2_c = min(ao2_core)
+                lwst.append(lwst_ao2_c)
+            if lwst[0]:
+                lwst_core = min(lwst)
 
         # Finding lowest outer orbital
         lwst_mo_o = min(mo_outer)
@@ -370,13 +351,13 @@ class PyMoDia():
                     2.5*multiplicty_offset
                 i = i+6
 
-        loct_dict = self.__append_loct_dict(
-            loct_dict, orbe_x_start, orbe_x_end, orbe_heights,
-            orbe_multiplicity_heights)
+        loct_dict = self.__append_loct_dict(loct_dict, orbe_x_start,
+                                            orbe_x_end, orbe_heights,
+                                            orbe_multiplicity_heights)
 
         return loct_dict
 
-    def __append_loct_dict(loct_dict, orbe_x_start, orbe_x_end,
+    def __append_loct_dict(self, loct_dict, orbe_x_start, orbe_x_end,
                            orbe_heights,
                            orbe_multiplicity_heights):
         """
@@ -398,13 +379,17 @@ class PyMoDia():
         Draws the atomic and molecular orbital energy levels
         """
         colors_mo = self.style.mo_color
-        colors_ao1 = self.style.ao2_color
+        colors_ao1 = self.style.ao1_color
         colors_ao2 = self.style.ao2_color
 
+        mo_loc = self.__mo_loc
+        ao1_loc = self.__ao1_loc
+        ao2_loc = self.__ao2_loc
+
         # Drawing MOs and AOs with multiplicty
-        self.__draw_level(self.__mo_loc, colors_mo)
-        self.__draw_level(self.__ao1_loc, colors_ao1)
-        self.__draw_level(self.__ao2_loc, colors_ao2)
+        self.__draw_level(mo_loc, colors_mo)
+        self.__draw_level(ao1_loc, colors_ao1)
+        self.__draw_level(ao2_loc, colors_ao2)
 
     def __draw_level(self, loc_dict, colors):
         """
@@ -533,7 +518,7 @@ class PyMoDia():
         core_height = self.settings.core_height
         margin = self.settings.margin
 
-        color = self.style.main_color
+        color = self.style.box_color
 
         if len(mo_core) != 0:
             self.image.append(draw.Rectangle(
@@ -544,8 +529,7 @@ class PyMoDia():
         else:
             raise Exception("no box around core drawn, no level in core")
 
-    def __draw_occupancies(self, arrow_head_size=6,
-                           arrow_color='main color'):
+    def __draw_occupancies(self):
         """
         Draws the occupancy of energy levels with either arrow symbols
         """
@@ -565,6 +549,7 @@ class PyMoDia():
 
         # making arrow
         arrow_color = self.style.arrow_color
+        arrow_head_size = self.style.arrow_head_size
         arrow = draw.Marker(-0.2, -0.4, 0.6, 0.4,
                             scale=arrow_head_size, orient='auto')
         arrow.append(draw.Lines(-0.2, 0.4, 0, 0, -0.2, -0.4, 0.6, 0,
@@ -579,7 +564,9 @@ class PyMoDia():
         # atom 1 levels
         for e in range(len(ao1_loc['ye'])):
             nr_levels = ao1_loc['ye'].count(ao1_loc['ye'][e])
-            if (ao1_loc['ye'][e] == ao1_loc['yme'][e]) or ((ao1_loc['ye'][e]) == (ao1_loc['yme'][e]-0.5*multiplicty_offset)):
+            if (ao1_loc['ye'][e] == ao1_loc['yme'][e]) or \
+                ((ao1_loc['ye'][e]) ==
+                 (ao1_loc['yme'][e] - 0.5*multiplicty_offset)):
                 if ao1_e_count >= 2*nr_levels:
                     nr_e = 2*nr_levels
                 else:
@@ -624,104 +611,72 @@ class PyMoDia():
         Draws the occupancy of energy (multiplicity) level(s) based on nr_elec
         and nr_levels
         """
+        x_space = self.style.x_space
+
         if nr_elec <= 0:
             # do nothing
             pass
         elif nr_elec == 2*nr_levels:
             # sets of fully filled levels
             if nr_levels == 1:
-                self.__draw_arrow_set(self, level_loc_x, level_loc_y)
+                self.__draw_arrow_set(level_loc_x, level_loc_y)
             elif nr_levels == 2:
-                self.__draw_arrow_set(
-                    self, level_loc_x+0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-0.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
             elif nr_levels == 3:
-                self.__draw_arrow_set(
-                    self, level_loc_x+self.__x_space, level_loc_y)
-                self.__draw_arrow_set(self, level_loc_x, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-self.__x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-x_space, level_loc_y)
             elif nr_levels == 4:
-                self.__draw_arrow_set(
-                    self, level_loc_x+1.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x+0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-1.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
         elif nr_elec <= nr_levels:
             # only partial occupied levels
             if nr_elec == 1:
-                self.__draw_arrow_single(self, level_loc_x, level_loc_y)
+                self.__draw_arrow_single(level_loc_x, level_loc_y)
             elif nr_elec == 2:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x -
-                                         0.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x-0.5*x_space, level_loc_y)
             elif nr_levels == 3:
-                self.__draw_arrow_single(
-                    self, level_loc_x+self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x, level_loc_y)
-                self.__draw_arrow_single(
-                    self, level_loc_x-self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x, level_loc_y)
+                self.__draw_arrow_single(level_loc_x-x_space, level_loc_y)
             elif nr_levels == 4:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         1.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x +
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x -
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x -
-                                         1.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x-1.5*x_space, level_loc_y)
         elif nr_elec == nr_levels+1:
             if nr_elec == 3:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-0.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
             elif nr_elec == 4:
-                self.__draw_arrow_single(
-                    self, level_loc_x+self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-x_space, level_loc_y)
             elif nr_levels == 5:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         1.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x +
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x -
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-1.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
         elif nr_elec == nr_levels+2:
             if nr_elec == 5:
-                self.__draw_arrow_single(
-                    self, level_loc_x+self.__x_space, level_loc_y)
-                self.__draw_arrow_set(self, level_loc_x, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-x_space, level_loc_y)
             elif nr_levels == 5:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         1.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_single(self, level_loc_x +
-                                         0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-1.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
         elif nr_elec == nr_levels+3:
             if nr_levels == 7:
-                self.__draw_arrow_single(self, level_loc_x +
-                                         1.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x+0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-0.5*self.__x_space, level_loc_y)
-                self.__draw_arrow_set(
-                    self, level_loc_x-1.5*self.__x_space, level_loc_y)
+                self.__draw_arrow_single(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
 
     def __draw_arrow_set(self, x, y):
         """
@@ -745,7 +700,7 @@ class PyMoDia():
                                     stroke=arrow_color,
                                     marker_end=arrow))
 
-    def __draw_arrow_single(self, x, y, color):
+    def __draw_arrow_single(self, x, y):
         """
         Adds an single arrow (one up) at location x,y
         """
@@ -758,29 +713,38 @@ class PyMoDia():
                                     stroke=arrow_color,
                                     marker_end=arrow))
 
-    def __draw_contributions(self, abs_cutoff=0.4, print_coeff=False,
-                             opacity=0, linestyle='6', color='main color'):
+    def __draw_contributions(self):
         """
         Draws the contributions of the different atomic orbitals to the
         molecular orbitals
         """
+        abs_cutoff = self.settings.orbc_cutoff
+        print_coeff = self.settings.draw_orbc
+        opacity = self.style.orbc_opacity
+        linestyle = self.style.orbc_linestyle
+        color = self.style.orbc_color
+        font_size = self.style.orbc_font_size
+        font_family = self.style.font_family
+
+        orbc = self.data.orbc
+        ao1_loc = self.__ao1_loc
+        ao2_loc = self.__ao2_loc
+        mo_loc = self.__mo_loc
+
         path_memory = []
 
-        if color == 'main color':
-            color = self.color
+        for i in range(len(orbc[0])):
+            for j in range(len(orbc[0])):
+                if abs(orbc[i][j]) >= abs_cutoff:
 
-        for i in range(len(self.orbc[0])):
-            for j in range(len(self.orbc[0])):
-                if abs(self.orbc[i][j]) >= abs_cutoff:
-
-                    ao1_end_index = len(self.ao1_loc['xb'])-1
-                    ao1_len = len(self.ao1_loc['xb'])
+                    ao1_end_index = len(ao1_loc['xb'])-1
+                    ao1_len = len(ao1_loc['xb'])
 
                     if (j <= ao1_end_index):
-                        p = draw.Line(self.ao1_loc['xe'][j],
-                                      self.ao1_loc['ye'][j],
-                                      self.mo_loc['xb'][i],
-                                      self.mo_loc['yb'][i], stroke=color,
+                        p = draw.Line(ao1_loc['xe'][j],
+                                      ao1_loc['ye'][j],
+                                      mo_loc['xb'][i],
+                                      mo_loc['yb'][i], stroke=color,
                                       fill_opacity=opacity,
                                       stroke_dasharray=linestyle)
                         path_memory.append(p)
@@ -789,36 +753,36 @@ class PyMoDia():
 
                         if print_coeff is True:
                             str_coeffs = [str(round(c, 2))
-                                          for c in self.orbc[i]]
+                                          for c in orbc[i]]
                             if path_memory.count(p) == 1:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=-0.4, fill=color))
                             elif path_memory.count(p) == 2:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=1, fill=color))
                             elif path_memory.count(p) == 3:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=2, fill=color))
                             elif path_memory.count(p) == 4:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=-1.4, fill=color))
                     elif (j > ao1_end_index):
-                        p = draw.Line(self.mo_loc['xe'][i],
-                                      self.mo_loc['ye'][i],
-                                      self.ao2_loc['xb'][j-ao1_len],
-                                      self.ao2_loc['yb'][j-ao1_len],
+                        p = draw.Line(mo_loc['xe'][i],
+                                      mo_loc['ye'][i],
+                                      ao2_loc['xb'][j-ao1_len],
+                                      ao2_loc['yb'][j-ao1_len],
                                       stroke=color, fill_opacity=opacity,
                                       stroke_dasharray=linestyle)
                         path_memory.append(p)
@@ -827,34 +791,33 @@ class PyMoDia():
 
                         if print_coeff is True:
                             str_coeffs = [str(round(c, 2))
-                                          for c in self.orbc[i]]
+                                          for c in orbc[i]]
                             if path_memory.count(p) == 1:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=-0.4, fill=color))
                             elif path_memory.count(p) == 2:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=1, fill=color))
                             elif path_memory.count(p) == 3:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=2, fill=color))
                             elif path_memory.count(p) == 4:
                                 self.image.append(draw.Text(
-                                    str_coeffs[j], self.font_size, path=p,
+                                    str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=self.font_family,
+                                    font_family=font_family,
                                     line_offset=-1.4, fill=color))
 
-    def __draw_energy_scale(self, style='mo', labels=None,
-                            unit='Hartree'):
+    def __draw_energy_scale(self):
         """
         Draws the energy scale with energy labels
 
@@ -863,82 +826,99 @@ class PyMoDia():
             - mo_ao : both molecular and atomic orbital labls
             - ao : only atomic orbitals labels
         """
+        margin = self.settings.margin
+        height = self.settings.height
+        font_family = self.style.font_family
+        font_size = self.style.font_size
+
+        unit = self.settings.unit
+        color = self.style.energy_scale_color
 
         # Drawing the bar itself
         arrow = draw.Marker(-0.3, -0.4, 0.6, 0.4, scale=10, orient='auto')
         arrow.append(draw.Lines(-0.3, 0.4, 0, 0, -0.3, -0.4, 0.6, 0,
-                                fill=self.color, close=True))
-        self.image.append(draw.Line(self.margin, self.height-self.margin+14,
-                                    self.margin, 0.5*self.margin,
-                                    stroke=self.color, marker_end=arrow))
+                                fill=color, close=True))
+        self.image.append(draw.Line(margin, height-margin+14,
+                                    margin, 0.5*margin,
+                                    stroke=color, marker_end=arrow))
 
         # Adding energy and unit to bar
-        self.image.append(draw.Text('Energy', self.font_size,
+        self.image.append(draw.Text('Energy', font_size,
                                     3, 20,
                                     center=True, text_anchor='begin',
-                                    font_family=self.font_family,
-                                    fill=self.color))
+                                    font_family=font_family,
+                                    fill=color))
         if unit == 'Hartree':
-            self.image.append(draw.Text('(Hartree)', self.font_size,
+            self.image.append(draw.Text('(Hartree)', font_size,
                                         3, 35,
                                         center=True, text_anchor='begin',
-                                        font_family=self.font_family,
-                                        fill=self.color))
+                                        font_family=font_family,
+                                        fill=color))
+        elif unit == 'Ht':
+            self.image.append(draw.Text('(Ht)', font_size,
+                                        3, 35,
+                                        center=True, text_anchor='begin',
+                                        font_family=font_family,
+                                        fill=color))
         else:
             raise NotImplementedError("Other units are not yet implemented")
 
-    def __draw_energy_labels(self, labels, style='mo', significant_digits=2):
+    def __draw_energy_labels(self):
         """
         Adds energy labels to energy scale
         """
-        self.__significant_digits = significant_digits
+        style = self.settings.energy_scale_style
+        labels = self.settings.energy_scale_labels
+
+        moe = self.data.moe
+        aoe1 = self.data.atom1.e
+        aoe2 = self.data.atom2.e
+        nr_a1 = self.data.atom1.nr
+        nr_a2 = self.data.atom2.nr
+
+        mo_loc = self.__mo_loc
+        ao1_loc = self.__ao1_loc
+        ao2_loc = self.__ao2_loc
 
         if style == 'mo':
             if isinstance(labels, list) or isinstance(labels, np.ndarray):
-                self.__draw_energy_labels(self, self.mo_loc, labels, core=True)
+                self.__draw_energy_label(mo_loc, labels, core=True)
             else:
-                self.__draw_energy_labels(
-                    self, self.mo_loc, self.moe, core=True)
+                self.__draw_energy_label(mo_loc, moe, core=True)
 
         elif style == 'mo_ao':
             if isinstance(labels, list) or isinstance(labels, np.ndarray):
-                self.__draw_energy_labels(
-                    self, self.mo_loc, labels[0], core=True)
-                self.__draw_energy_labels(self, self.ao1_loc, labels[1])
-                self.__draw_energy_labels(self, self.ao2_loc, labels[2])
+                self.__draw_energy_label(mo_loc, labels[0], core=True)
+                self.__draw_energy_label(ao1_loc, labels[1])
+                self.__draw_energy_label(ao2_loc, labels[2])
             else:
-                if self.molecule.nr_a1 > 1:
-                    atom1_energies = self.atom1.energies*self.molecule.nr_a1
+                if nr_a1 > 1:
+                    aoe1 = aoe1*nr_a1
                 else:
-                    atom1_energies = self.atom1.energies
-                if self.molecule.nr_a2 > 1:
-                    atom2_energies = self.atom2.energies*self.molecule.nr_a2
+                    aoe1 = aoe1
+                if nr_a2 > 1:
+                    aoe2 = aoe2*nr_a2
                 else:
-                    atom2_energies = self.atom2.energies
-                self.__draw_energy_labels(
-                    self, self.mo_loc, self.moe, core=True)
-                self.__draw_energy_labels(self, self.ao1_loc, atom1_energies)
-                self.__draw_energy_labels(self, self.ao2_loc, atom2_energies)
+                    aoe2 = aoe2
+                self.__draw_energy_label(mo_loc, moe, core=True)
+                self.__draw_energy_label(ao1_loc, aoe1)
+                self.__draw_energy_label(ao2_loc, aoe2)
 
         elif style == 'ao':
             if isinstance(labels, list) or isinstance(labels, np.ndarray):
-                self.__draw_energy_labels(
-                    self, self.ao1_loc, labels[0], core=True)
-                self.__draw_energy_labels(
-                    self, self.ao2_loc, labels[1], core=True)
+                self.__draw_energy_label(ao1_loc, labels[0], core=True)
+                self.__draw_energy_label(ao2_loc, labels[1], core=True)
             else:
-                if self.molecule.nr_a1 > 1:
-                    atom1_energies = self.atom1.energies*self.molecule.nr_a1
+                if nr_a1 > 1:
+                    aoe1 = aoe1*nr_a1
                 else:
-                    atom1_energies = self.atom1.energies
-                if self.molecule.nr_a2 > 1:
-                    atom2_energies = self.atom2.energies*self.molecule.nr_a2
+                    aoe1 = aoe1
+                if nr_a2 > 1:
+                    aoe2 = aoe2*nr_a2
                 else:
-                    atom2_energies = self.atom2.energies
-                self.__draw_energy_labels(self, self.ao1_loc,
-                                          self.atom1.energies, core=True)
-                self.__draw_energy_labels(self, self.ao2_loc,
-                                          self.atom2.energies, core=True)
+                    aoe2 = aoe2
+                self.__draw_energy_label(ao1_loc, aoe1, core=True)
+                self.__draw_energy_label(ao2_loc, aoe2, core=True)
         else:
             raise Exception("An invalid style for energy lables, valid styles"
                             " include 'mo', 'mo_ao' and 'ao'")
@@ -947,39 +927,53 @@ class PyMoDia():
         """
         Adds energy labels to energy scale
         """
+
+        # core tag is used to only draw labels once, ao energies and
+        # mo energies vary a small amount in energy so tags would be draw
+        # on top of each other
+
+        margin = self.settings.margin
+        core_cutoff = self.settings.core_cutoff
+        significant_digits = self.settings.label_significant_digits
+
+        font_family = self.style.font_family
+        font_size = self.style.font_size
+        color = self.style.energy_scale_color
+
         text_memory = []
-        x = self.margin - 4
+        x = margin - 4
         for j in range(len(loc_dict['xb'])):
-            t = draw.Text(str(round(labels[j], self.__significant_digits)),
-                          self.font_size,
+            t = draw.Text(str(round(labels[j], significant_digits)),
+                          font_size,
                           x, loc_dict['yb'][j],
                           center=True, text_anchor='end',
-                          font_family=self.font_family, fill=self.color)
+                          font_family=font_family, fill=color)
             text_memory.append(t)
             if core:
                 if text_memory.count(t) == 1:
                     self.image.append(t)
-                    self.image.append(draw.Line(self.margin,
+                    self.image.append(draw.Line(margin,
                                                 loc_dict['yb'][j], x+1,
                                                 loc_dict['yb'][j],
-                                                stroke=self.color))
+                                                stroke=color))
             else:
-                if (round(labels[j], self.__significant_digits) >=
-                        self.core_cutoff and text_memory.count(t) == 1):
+                if (round(labels[j], significant_digits) >=
+                        core_cutoff and text_memory.count(t) == 1):
                     self.image.append(t)
-                    self.image.append(draw.Line(self.margin,
+                    self.image.append(draw.Line(margin,
                                                 loc_dict['yb'][j], x+1,
                                                 loc_dict['yb'][j],
-                                                stroke=self.color))
+                                                stroke=color))
 
-    def __draw_level_labels(self, labels_mo=[], style='mo',
-                            labels_ao1=['1s', '2s', '2p', '2p',
-                                        '2p', '3s', '3p', '3p', '3p'],
-                            labels_ao2=['1s', '2s', '2p', '2p', '2p',
-                                        '3s', '3p', '3p', '3p']):
+    def __draw_level_labels(self):
         """
         Adds labels to atomic and molecular orbitals
         """
+        style = self.settings.level_labels_style
+        labels_mo = self.settings.mo_labels
+        labels_ao1 = self.settings.ao1_labels
+        labels_ao2 = self.settings.ao2_labels
+
         if style == 'mo':
             self.__draw_mo_labels(self, labels_mo)
         elif style == 'mo_ao':
@@ -997,18 +991,23 @@ class PyMoDia():
         """
         Adds labels to molecular orbitals
         """
+        mo_loc = self.__mo_loc
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
+
         label_memory = []
         y_memory = []
-        x = self.mo_loc['xe'][0]
+        x = mo_loc['xe'][0]
 
-        for j in range(len(self.mo_loc['xb'])):
+        for j in range(len(mo_loc['xb'])):
             label = draw.Text(labels[j],
-                              self.font_size,
-                              x, self.mo_loc['ymb'][j]+10,
+                              font_size,
+                              x, mo_loc['ymb'][j]+10,
                               center=True, text_anchor='end',
-                              font_family=self.font_family, fill=self.color)
+                              font_family=font_family, fill=color)
             label_memory.append(label)
-            y = self.mo_loc['yb'][j]
+            y = mo_loc['yb'][j]
             y_memory.append(y)
 
         unique_y = []
@@ -1030,14 +1029,19 @@ class PyMoDia():
         """
         Adds labels to atomic orbitals of atom 1
         """
+        ao1_loc = self.__ao1_loc
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
+
         label_memory = []
-        x = self.ao1_loc['xb'][0]-2
-        for j in range(len(self.ao1_loc['xb'])):
+        x = ao1_loc['xb'][0]-2
+        for j in range(len(ao1_loc['xb'])):
             label = draw.Text(labels[j],
-                              self.font_size,
-                              x, self.ao1_loc['yb'][j],
+                              font_size,
+                              x, ao1_loc['yb'][j],
                               center=True, text_anchor='end',
-                              font_family=self.font_family, fill=self.color)
+                              font_family=font_family, fill=color)
             label_memory.append(label)
             if label_memory.count(label) == 1:
                 self.image.append(label)
@@ -1046,14 +1050,19 @@ class PyMoDia():
         """
         Adds labels to atomic orbitals of atom 2
         """
+        ao2_loc = self.__ao2_loc
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
+
         label_memory = []
-        x = self.ao2_loc['xe'][0]+2
-        for j in range(len(self.ao2_loc['xb'])):
+        x = ao2_loc['xe'][0]+2
+        for j in range(len(ao2_loc['xb'])):
             label = draw.Text(labels[j],
-                              self.font_size,
-                              x, self.ao2_loc['yb'][j],
+                              font_size,
+                              x, ao2_loc['yb'][j],
                               center=True, text_anchor='begin',
-                              font_family=self.font_family, fill=self.color)
+                              font_family=font_family, fill=color)
             label_memory.append(label)
             if label_memory.count(label) == 1:
                 self.image.append(label)

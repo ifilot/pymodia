@@ -1,18 +1,32 @@
-settings = dict()
-occu = dict()
-line = dict()
+import pyqint
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-occu['value'] = 0.2
-occu['color'] = "blue"
 
-line['value'] = 0.5
-line['color'] = "red"
+# PyQInt calculations
+mol = pyqint.Molecule()
+dist = 1.78/2
+mol.add_atom('C', 0.0, 0.0, 0.0, unit='angstrom')
+mol.add_atom('H', dist, dist, dist, unit='angstrom')
+mol.add_atom('H', -dist, -dist, dist, unit='angstrom')
+mol.add_atom('H', -dist, dist, -dist, unit='angstrom')
+mol.add_atom('H', dist, -dist, -dist, unit='angstrom')
+cgfs, atoms = mol.build_basis('sto3g')
+res = pyqint.HF().rhf(mol, basis='sto3g')
 
-settings["occupancy"] = occu
-settings["occupancy"]["draw"] = True
-settings["lines"] = line
+# Setting up PyMoDia objects
+C = Atom("C")
+H = Atom("H")
+molname = subscript("CH4")
+Mol = MoDiaMolecule(molname, C, 1, H, 4)
 
-if settings["occupancy"]["draw"]:
-    print(settings["occupancy"])
+CH4 = MoDiaData(molecule=Mol).from_pyqint(res)
 
-# print(settings)
+diagram = MoDia(CH4)
+print(diagram.data.atom2.e)
+
+# Save image
+diagram.export_svg(os.path.join(
+    os.path.dirname(__file__), "CH4_mo_diagram.svg"))

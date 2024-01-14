@@ -132,20 +132,6 @@ ao_dict = {
         "labels": ["1s", "2s", "2p", "3s", "3p", "4s"],
         "ao_energy": [-0.50]
     },
-    'Br': {
-        "atom": "Bromine",
-        "atomic_number": 35,
-        "configuration": "([Ar]3d¹⁰4s²4p⁵)",
-        "labels": [""],
-        "ao_energy": [-0.50]
-    },
-    'I': {
-        "atom": "Iodine",
-        "atomic_number": 53,
-        "configuration": "([kr]4d¹⁰5s²5p⁵)",
-        "labels": [""],
-        "ao_energy": [-0.50]
-    },
 }
 
 
@@ -156,9 +142,9 @@ class Atom():
 
     def __init__(self, atomic_symbol, energy_levels=None):
         self.name = atomic_symbol
-        
+
         ai = ao_dict[self.name]
-        
+
         if energy_levels is None:
             self.energies = ai["ao_energy"]
         else:
