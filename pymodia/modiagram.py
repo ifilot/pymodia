@@ -29,7 +29,9 @@ class MoDia():
                             'draw_energy_labels', 'draw_level_labels',
                             'draw_configuration', 'draw_orbc',
                             'energy_scale_style', 'energy_scale_labels',
-                            'unit', 'label_significant_digits'}
+                            'unit', 'label_significant_digits',
+                            'level_labels_style', 'mo_labels',
+                            'ao1_labels', 'ao2_labels', 'draw_contributions'}
         self.settings.__dict__.update((k, v) for k, v in kwargs.items()
                                       if k in allowed_settings)
 
@@ -46,9 +48,7 @@ class MoDia():
                          'arrow_head_size', 'background_color',
                          'main_color', 'name_color', 'arrow_color',
                          'orbc_color', 'box_color', 'energy_scale_color',
-                         'mo_color', 'ao1_color', 'ao2_color',
-                         'level_labels_style', 'mo_labels', 'ao1_labels',
-                         'ao2_labels'}
+                         'mo_color', 'ao1_color', 'ao2_color'}
         self.style.__dict__.update((k, v) for k, v in kwargs.items()
                                    if k in allowed_style)
 
@@ -80,6 +80,7 @@ class MoDia():
         # find locations to draw levels
         self.__find_core()
         self.__find_locations()
+        # print(self.__ao2_loc)
 
         # adding levels
         self.__draw_levels()
@@ -97,7 +98,7 @@ class MoDia():
         self.__draw_occupancies()
 
         # draw orbc lines:
-        if self.settings.draw_orbc:
+        if self.settings.draw_contributions:
             self.__draw_contributions()
 
         # add energy labels
@@ -239,21 +240,22 @@ class MoDia():
             s_ao2_outer = s_ao2_outer*nr_a2
 
         # making dictonaries
-        empty_loc_dic = {'xb': [], 'yb': [], 'xe': [], 'ye': [], 'ymb': [],
-                         'yme': []}
-        mo_loc = empty_loc_dic
+        mo_loc = {'xb': [], 'yb': [], 'xe': [], 'ye': [], 'ymb': [],
+                  'yme': []}
         mo_loc = self.__location_dictonary(mo_loc, s_mo_core, 'mo',
                                            height_0_core)
         mo_loc = self.__location_dictonary(mo_loc, s_mo_outer, 'mo',
                                            height_0_outer)
 
-        ao1_loc = empty_loc_dic
+        ao1_loc = {'xb': [], 'yb': [], 'xe': [], 'ye': [], 'ymb': [],
+                   'yme': []}
         ao1_loc = self.__location_dictonary(ao1_loc, s_ao1_core, 'ao1',
                                             height_0_core)
         ao1_loc = self.__location_dictonary(ao1_loc, s_ao1_outer, 'ao1',
                                             height_0_outer)
 
-        ao2_loc = empty_loc_dic
+        ao2_loc = {'xb': [], 'yb': [], 'xe': [], 'ye': [], 'ymb': [],
+                   'yme': []}
         ao2_loc = self.__location_dictonary(ao2_loc, s_ao2_core, 'ao2',
                                             height_0_core)
         ao2_loc = self.__location_dictonary(ao2_loc, s_ao2_outer, 'ao2',
@@ -975,14 +977,14 @@ class MoDia():
         labels_ao2 = self.settings.ao2_labels
 
         if style == 'mo':
-            self.__draw_mo_labels(self, labels_mo)
+            self.__draw_mo_labels(labels_mo)
         elif style == 'mo_ao':
-            self.__draw_mo_labels(self, labels_mo)
-            self.__draw_ao1_labels(self, labels_ao1)
-            self.__draw_ao2_labels(self, labels_ao2)
+            self.__draw_mo_labels(labels_mo)
+            self.__draw_ao1_labels(labels_ao1)
+            self.__draw_ao2_labels(labels_ao2)
         elif style == 'ao':
-            self.__draw_ao1_labels(self, labels_ao1)
-            self.__draw_ao2_labels(self, labels_ao2)
+            self.__draw_ao1_labels(labels_ao1)
+            self.__draw_ao2_labels(labels_ao2)
         else:
             raise Exception("An invalid style for lables, valid styles include"
                             " 'mo', 'mo_ao' and 'ao'")
@@ -992,9 +994,9 @@ class MoDia():
         Adds labels to molecular orbitals
         """
         mo_loc = self.__mo_loc
-        font_size = self.settings.font_size
-        font_family = self.settings.font_family
-        color = self.settings.main_color
+        font_size = self.style.font_size
+        font_family = self.style.font_family
+        color = self.style.main_color
 
         label_memory = []
         y_memory = []
@@ -1030,9 +1032,9 @@ class MoDia():
         Adds labels to atomic orbitals of atom 1
         """
         ao1_loc = self.__ao1_loc
-        font_size = self.settings.font_size
-        font_family = self.settings.font_family
-        color = self.settings.main_color
+        font_size = self.style.font_size
+        font_family = self.style.font_family
+        color = self.style.main_color
 
         label_memory = []
         x = ao1_loc['xb'][0]-2
@@ -1051,9 +1053,9 @@ class MoDia():
         Adds labels to atomic orbitals of atom 2
         """
         ao2_loc = self.__ao2_loc
-        font_size = self.settings.font_size
-        font_family = self.settings.font_family
-        color = self.settings.main_color
+        font_size = self.style.font_size
+        font_family = self.style.font_family
+        color = self.style.main_color
 
         label_memory = []
         x = ao2_loc['xe'][0]+2

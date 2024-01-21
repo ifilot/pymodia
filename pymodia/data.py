@@ -87,21 +87,21 @@ class MoDiaData():
     def from_pyqint(self, results):
 
         self.moe = results['orbe']
-        self.orbc = results['orbc']
+        self.orbc = np.transpose(results['orbc'])
 
         diag = np.diagonal(results['fock']).tolist()
 
         nr_a1 = self.atom1.nr
 
         level_a_1 = self.__nr_levels(self.atom1.atomic_number)
-        level_a_2 = self.__nr_levels(self.atom1.atomic_number)
+        level_a_2 = self.__nr_levels(self.atom2.atomic_number)
 
         self.atom1.e = diag[0:level_a_1]
 
         if nr_a1 == 1:
-            self.atom2.e = diag[level_a_1:level_a_1+level_a_2+1]
+            self.atom2.e = diag[level_a_1:level_a_1+level_a_2]
         else:
-            self.atom2.e = diag[nr_a1*level_a_1:nr_a1*level_a_1+level_a_2+1]
+            self.atom2.e = diag[nr_a1*level_a_1:nr_a1*level_a_1+level_a_2]
 
         return self
 

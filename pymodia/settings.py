@@ -13,7 +13,8 @@ class MoDiaSettings():
                             'draw_energy_labels', 'draw_level_labels',
                             'draw_configuration', 'draw_orbc',
                             'energy_scale_style', 'energy_scale_labels',
-                            'unit', 'label_significant_digits'}
+                            'unit', 'label_significant_digits',
+                            'draw_contributions'}
         self.__dict__.update((k, v) for k, v in kwargs.items()
                              if k in allowed_settings)
 
@@ -32,13 +33,14 @@ class MoDiaSettings():
         self.draw_background = True
         self.draw_core_box = True
         self.draw_occupancies = True
-        self.draw_energy_labels = False
+        self.draw_contributions = True
+        self.draw_energy_labels = True
         self.draw_level_labels = False
-        self.draw_configuration = False
+        self.draw_configuration = True
         self.draw_orbc = False
         self.energy_scale_style = 'mo'
         self.energy_scale_labels = None
-        self.unit = 'Hartree'
+        self.unit = 'Ht'
         self.level_labels_style = 'ao'
         self.mo_labels = None
         self.ao1_labels = ['1s', '2s',
