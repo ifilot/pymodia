@@ -1,6 +1,7 @@
 import drawsvg as draw
 import numpy as np
-from . import MoDiaSettings, MoDiaStyle
+import os
+from . import MoDiaSettings
 
 
 class MoDia():
@@ -21,36 +22,13 @@ class MoDia():
             self.settings = MoDiaSettings()
 
         # changing settings via kwargs
-        allowed_settings = {'core_cutoff', 'orbc_cutoff', 'width', 'height',
-                            'core_height', 'outer_height', 'margin',
-                            'level_width', 'line_width', 'multiplicity_offset',
-                            'mo_round', 'ao_round', 'draw_background',
-                            'draw_core_box', 'draw_occupancies',
-                            'draw_energy_labels', 'draw_level_labels',
-                            'draw_configuration', 'draw_orbc',
-                            'energy_scale_style', 'energy_scale_labels',
-                            'unit', 'label_significant_digits',
-                            'level_labels_style', 'mo_labels',
-                            'ao1_labels', 'ao2_labels', 'draw_contributions'}
+        allowed_settings_file = open(os.path.join(os.path.dirname(__file__),
+                                                  'allowed_settings.txt'), "r")
+        allowed_settings = allowed_settings_file.read()
+        allowed_settings_file.close()
+
         self.settings.__dict__.update((k, v) for k, v in kwargs.items()
                                       if k in allowed_settings)
-
-        # import style object
-        if 'style' in kwargs:
-            self.style = kwargs['style']
-        else:
-            self.style = MoDiaStyle()
-
-        # changing style via kwargs
-        allowed_style = {'font_size', 'font_family', 'arrow_length', 'x_space',
-                         'x_space_interset', 'orbc_opacity',
-                         'orbc_linestyle', 'orbc_font_size',
-                         'arrow_head_size', 'background_color',
-                         'main_color', 'name_color', 'arrow_color',
-                         'orbc_color', 'box_color', 'energy_scale_color',
-                         'mo_color', 'ao1_color', 'ao2_color'}
-        self.style.__dict__.update((k, v) for k, v in kwargs.items()
-                                   if k in allowed_style)
 
         # rounding energies
         self.data.moe = [round(moe, self.settings.mo_round) for moe
@@ -69,13 +47,13 @@ class MoDia():
         self.image = draw.Drawing(self.settings.width, self.settings.height)
 
         # embed font from google
-        self.image.embed_google_font(self.style.font_family)
+        self.image.embed_google_font(self.settings.font_family)
 
         # add background
         if self.settings.draw_background:
             self.image.append(draw.Rectangle(0, 0, self.settings.width,
                                              self.settings.height,
-                                             fill=self.style.background_color))
+                                             fill=self.settings.background_color))
 
         # find locations to draw levels
         self.__find_core()
@@ -380,9 +358,9 @@ class MoDia():
         """
         Draws the atomic and molecular orbital energy levels
         """
-        colors_mo = self.style.mo_color
-        colors_ao1 = self.style.ao1_color
-        colors_ao2 = self.style.ao2_color
+        colors_mo = self.settings.mo_color
+        colors_ao1 = self.settings.ao1_color
+        colors_ao2 = self.settings.ao2_color
 
         mo_loc = self.__mo_loc
         ao1_loc = self.__ao1_loc
@@ -419,7 +397,7 @@ class MoDia():
         else:
             if len(colors) < len(loc_dict['xb']):
                 raise ValueError(
-                    "Insufficient colors specified. Need at least %i colors."
+                    'Insufficient colors specified. Need at least %i colors.'
                     % len(loc_dict['xb']))
 
             for j in range(len(loc_dict['xb'])):
@@ -445,8 +423,8 @@ class MoDia():
         margin = self.settings.margin
         level_width = self.settings.level_width
 
-        font_family = self.style.font_family
-        color = self.style.name_color
+        font_family = self.settings.font_family
+        color = self.settings.name_color
 
         if nr_a1 == 1:
             self.image.append(draw.Text(
@@ -456,7 +434,7 @@ class MoDia():
                 font_family=font_family, fill=color))
         else:
             self.image.append(draw.Text(
-                (str(nr_a1) + "x" + name_a1),
+                (str(nr_a1) + 'x' + name_a1),
                 names_font_size, (2*margin + 0.5*level_width),
                 (height - 0.5*margin), center=True,
                 font_family=font_family, fill=color))
@@ -469,7 +447,7 @@ class MoDia():
                 font_family=font_family, fill=color))
         else:
             self.image.append(draw.Text(
-                (str(nr_a2) + "x" + name_a2),
+                (str(nr_a2) + 'x' + name_a2),
                 names_font_size, (width - (margin + 0.5*level_width)),
                 (height - 0.5*margin), center=True,
                 font_family=font_family, fill=color))
@@ -491,8 +469,8 @@ class MoDia():
         margin = self.settings.margin
         level_width = self.settings.level_width
 
-        font_family = self.style.font_family
-        color = self.style.name_color
+        font_family = self.settings.font_family
+        color = self.settings.name_color
 
         self.image.append(draw.Text(config_a1,
                                     configuration_font_size,
@@ -520,7 +498,7 @@ class MoDia():
         core_height = self.settings.core_height
         margin = self.settings.margin
 
-        color = self.style.box_color
+        color = self.settings.box_color
 
         if len(mo_core) != 0:
             self.image.append(draw.Rectangle(
@@ -529,7 +507,7 @@ class MoDia():
                 (width - 3*margin+40),
                 (core_height + 37), fill_opacity=0, stroke=color))
         else:
-            raise Exception("no box around core drawn, no level in core")
+            raise Exception('no box around core drawn, no level in core')
 
     def __draw_occupancies(self):
         """
@@ -550,8 +528,8 @@ class MoDia():
         multiplicty_offset = self.settings.multiplicty_offset
 
         # making arrow
-        arrow_color = self.style.arrow_color
-        arrow_head_size = self.style.arrow_head_size
+        arrow_color = self.settings.arrow_color
+        arrow_head_size = self.settings.arrow_head_size
         arrow = draw.Marker(-0.2, -0.4, 0.6, 0.4,
                             scale=arrow_head_size, orient='auto')
         arrow.append(draw.Lines(-0.2, 0.4, 0, 0, -0.2, -0.4, 0.6, 0,
@@ -613,7 +591,7 @@ class MoDia():
         Draws the occupancy of energy (multiplicity) level(s) based on nr_elec
         and nr_levels
         """
-        x_space = self.style.x_space
+        x_space = self.settings.x_space
 
         if nr_elec <= 0:
             # do nothing
@@ -684,10 +662,10 @@ class MoDia():
         """
         Adds an arrow set (one up one down) at location x,y
         """
-        x_space_interset = self.style.x_space_interset
+        x_space_interset = self.settings.x_space_interset
         arrow = self.__arrow
-        arrow_color = self.style.arrow_color
-        arrow_length = self.style.arrow_length
+        arrow_color = self.settings.arrow_color
+        arrow_length = self.settings.arrow_length
 
         self.image.append(draw.Line(x - x_space_interset,
                                     y + 7/12*arrow_length,
@@ -707,8 +685,8 @@ class MoDia():
         Adds an single arrow (one up) at location x,y
         """
         arrow = self.__arrow
-        arrow_color = self.style.arrow_color
-        arrow_length = self.style.arrow_length
+        arrow_color = self.settings.arrow_color
+        arrow_length = self.settings.arrow_length
 
         self.image.append(draw.Line(x, y + 7/12*arrow_length,
                                     x, y - 5/12*arrow_length,
@@ -722,13 +700,13 @@ class MoDia():
         """
         abs_cutoff = self.settings.orbc_cutoff
         print_coeff = self.settings.draw_orbc
-        opacity = self.style.orbc_opacity
-        linestyle = self.style.orbc_linestyle
-        color = self.style.orbc_color
-        font_size = self.style.orbc_font_size
-        font_family = self.style.font_family
+        opacity = self.settings.orbc_opacity
+        linestyle = self.settings.orbc_linestyle
+        color = self.settings.orbc_color
+        font_size = self.settings.orbc_font_size
+        font_family = self.settings.font_family
 
-        orbc = self.data.orbc
+        orbc = np.transpose(self.data.orbc)
         ao1_loc = self.__ao1_loc
         ao2_loc = self.__ao2_loc
         mo_loc = self.__mo_loc
@@ -830,11 +808,11 @@ class MoDia():
         """
         margin = self.settings.margin
         height = self.settings.height
-        font_family = self.style.font_family
-        font_size = self.style.font_size
+        font_family = self.settings.font_family
+        font_size = self.settings.font_size
 
         unit = self.settings.unit
-        color = self.style.energy_scale_color
+        color = self.settings.energy_scale_color
 
         # Drawing the bar itself
         arrow = draw.Marker(-0.3, -0.4, 0.6, 0.4, scale=10, orient='auto')
@@ -863,7 +841,7 @@ class MoDia():
                                         font_family=font_family,
                                         fill=color))
         else:
-            raise NotImplementedError("Other units are not yet implemented")
+            raise NotImplementedError('Other units are not yet implemented')
 
     def __draw_energy_labels(self):
         """
@@ -938,9 +916,9 @@ class MoDia():
         core_cutoff = self.settings.core_cutoff
         significant_digits = self.settings.label_significant_digits
 
-        font_family = self.style.font_family
-        font_size = self.style.font_size
-        color = self.style.energy_scale_color
+        font_family = self.settings.font_family
+        font_size = self.settings.font_size
+        color = self.settings.energy_scale_color
 
         text_memory = []
         x = margin - 4
@@ -994,9 +972,9 @@ class MoDia():
         Adds labels to molecular orbitals
         """
         mo_loc = self.__mo_loc
-        font_size = self.style.font_size
-        font_family = self.style.font_family
-        color = self.style.main_color
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
 
         label_memory = []
         y_memory = []
@@ -1032,9 +1010,9 @@ class MoDia():
         Adds labels to atomic orbitals of atom 1
         """
         ao1_loc = self.__ao1_loc
-        font_size = self.style.font_size
-        font_family = self.style.font_family
-        color = self.style.main_color
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
 
         label_memory = []
         x = ao1_loc['xb'][0]-2
@@ -1053,9 +1031,9 @@ class MoDia():
         Adds labels to atomic orbitals of atom 2
         """
         ao2_loc = self.__ao2_loc
-        font_size = self.style.font_size
-        font_family = self.style.font_family
-        color = self.style.main_color
+        font_size = self.settings.font_size
+        font_family = self.settings.font_family
+        color = self.settings.main_color
 
         label_memory = []
         x = ao2_loc['xe'][0]+2

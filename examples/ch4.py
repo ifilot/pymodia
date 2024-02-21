@@ -1,70 +1,43 @@
-# Note that this example works without installing PyMoDia as a system-wide
-# package
-
-import sys,os
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
+import pyqint
+import os
+import sys
+import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from pymodia import PyMoDia, Atom, Molecule, subscript
-import pyqint
-import numpy as np
 
 # PyQInt calculations
 mol = pyqint.Molecule()
 dist = 1.78/2
+
 mol.add_atom('C', 0.0, 0.0, 0.0, unit='angstrom')
 mol.add_atom('H', dist, dist, dist, unit='angstrom')
 mol.add_atom('H', -dist, -dist, dist, unit='angstrom')
 mol.add_atom('H', -dist, dist, -dist, unit='angstrom')
 mol.add_atom('H', dist, -dist, -dist, unit='angstrom')
+
 cgfs, atoms = mol.build_basis('sto3g')
 res = pyqint.HF().rhf(mol, basis='sto3g')
 
-# Rounding PyQInt results for PyMoDia
-mo_energies = res['orbe']
-orbc = np.round(res['orbc'], 3)
-
-# Using Fock matrix diagonal for atomic orbital energy proxy
-F = res['fock']
-diag = np.diagonal(F).tolist()
-
 # Setting up PyMoDia objects
-C = Atom("C",diag[0:5])
-H = Atom("H",[diag[6]])
+diag = np.diagonal(res['fock']).tolist()
+C = Atom("C", diag[0:5])
+H = Atom("H", [diag[5]])
 molname = subscript("CH4")
-Mol = Molecule(molname, C, 1, H, 4)
+Mol = MoDiaMolecule(molname, C, 1, H, 4)
+print(diag[0:5])
 
-# Setting for the diagram
-core_cutoff = -2
-contribution_cutoff = 0.25
+CH4 = MoDiaData(molecule=Mol, moe=res['orbe'], orbc=res['orbc'])
 
-# Change canvas dimensions
-outer_height = 300                      # height for the valence electrons
-core_height = 60                        # height for the core electrons box
-height = outer_height+core_height+150   # total height of image
-
-# use distinct colors for core, sigma and pi orbitals in this diagram
-core = "#000000"
-sigma = "#1aa7ec"
-pi = "#ff751f"
-mo_colors = [core, core, pi, pi, pi,
-              sigma, pi, pi, pi]
-
-# use distinct colors for the atomic orbitals
-ao_colors_carbon = [core, sigma, pi, pi, pi]
-ao_colors_hydrogen = [sigma, sigma, sigma, sigma]
-
-    # Making diagram
-diagram = PyMoDia(Mol, mo_energies, orbc, outer_height=outer_height,
-                  core_height=core_height, height=height,
-                  core_cutoff=core_cutoff, draw_background=False)
-diagram.draw_levels(colors_mo=mo_colors, 
-                    colors_ao1=ao_colors_carbon,
-                    colors_ao2=ao_colors_hydrogen)
-diagram.draw_occupancies()
-diagram.draw_contributions(contribution_cutoff)
-diagram.draw_energy_scale()
-diagram.draw_labels(['1a1', '2a1', '1t2', '1t2', '1t2',
-                     '2t2', '2t2', '2t2', '3a1'], 'mo_ao')
+ao1_c = ['#000000', '#785EF0', '#fe6100', '#fe6100', '#fe6100']
+ao2_c = ['#785EF0']
+mo_c = ['#000000', '#785EF0', '#fe6100', '#fe6100', '#fe6100', '#785EF0',
+        '#fe6100', '#fe6100', '#fe6100']
+diagram = MoDia(CH4, ao1_color=ao1_c, ao2_color=ao2_c, mo_color=mo_c,
+                draw_level_labels=True, level_labels_style='mo_ao',
+                mo_labels=['1s', '1σ', '1π', '1π', '1π',
+                           '2σ*', '2π*', '2π*', '2π*'])
 
 # Save image
-diagram.image.save_svg("CH4_mo_diagram.svg")
+diagram.export_svg(os.path.join(
+    os.path.dirname(__file__), "CH4_mo_diagram.svg"))

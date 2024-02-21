@@ -1,0 +1,268 @@
+{
+    "H": {
+        "atom": "Hydrogen",
+        "atomic_number": 1,
+        "configuration": "(1s^1)",
+        "labels": [
+            "1s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "He": {
+        "atom": "Helium",
+        "atomic_number": 2,
+        "configuration": "(1s^2)",
+        "labels": [
+            "1s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Li": {
+        "atom": "Lithium",
+        "atomic_number": 3,
+        "configuration": "(1s^22s^1)",
+        "labels": [
+            "1s",
+            "2s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Be": {
+        "atom": "Beryllium",
+        "atomic_number": 4,
+        "configuration": "(1s^22s^2)",
+        "labels": [
+            "1s",
+            "2s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "B": {
+        "atom": "Boron",
+        "atomic_number": 5,
+        "configuration": "(1s^22s^22p^1)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "C": {
+        "atom": "Carbon",
+        "atomic_number": 6,
+        "configuration": "(1s^22s^22p^2)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -11.32,
+            -0.71,
+            -0.43,
+            -0.43,
+            -0.43
+        ]
+    },
+    "N": {
+        "atom": "Nitrogen",
+        "atomic_number": 7,
+        "configuration": "(1s^22s^22p^3)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "O": {
+        "atom": "Oxygen",
+        "atomic_number": 8,
+        "configuration": "(1s^22s^22p^4)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -20.66,
+            -1.24,
+            -0.6,
+            -0.6,
+            -0.6
+        ]
+    },
+    "F": {
+        "atom": "Fluorine",
+        "atomic_number": 9,
+        "configuration": "(1s^22s^22p^5)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Ne": {
+        "atom": "Neon",
+        "atomic_number": 10,
+        "configuration": "(1s^22s^22p^6)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Na": {
+        "atom": "Sodium",
+        "atomic_number": 11,
+        "configuration": "([Ne]3s^1)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Mg": {
+        "atom": "Magnesium",
+        "atomic_number": 12,
+        "configuration": "([Ne]3s^2)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Al": {
+        "atom": "Aluminium",
+        "atomic_number": 13,
+        "configuration": "([Ne]3s^23p^1)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Si": {
+        "atom": "Silicon",
+        "atomic_number": 14,
+        "configuration": "([Ne]3s^23p^2)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "P": {
+        "atom": "Phosphorus",
+        "atomic_number": 15,
+        "configuration": "([Ne]3s^23^3)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "S": {
+        "atom": "Sulfur",
+        "atomic_number": 16,
+        "configuration": "([Ne]3s^23p^4)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Cl": {
+        "atom": "Chlorine",
+        "atomic_number": 17,
+        "configuration": "([Ne]3s^23p^5)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "Ar": {
+        "atom": "Argon",
+        "atomic_number": 18,
+        "configuration": "([Ne]3s^23p^6)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    },
+    "K": {
+        "atom": "Potassium",
+        "atomic_number": 19,
+        "configuration": "([Ar]4s^1)",
+        "labels": [
+            "1s",
+            "2s",
+            "2p",
+            "3s",
+            "3p",
+            "4s"
+        ],
+        "ao_energy": [
+            -0.5
+        ]
+    }
+}

@@ -1,4 +1,3 @@
-from . import MoDiaMolecule
 from . import Empty
 import numpy as np
 
@@ -83,42 +82,6 @@ class MoDiaData():
         self.atom2.configuration = molecule.atom2.configuration
 
         return self
-
-    def from_pyqint(self, results):
-
-        self.moe = results['orbe']
-        self.orbc = np.transpose(results['orbc'])
-
-        diag = np.diagonal(results['fock']).tolist()
-
-        nr_a1 = self.atom1.nr
-
-        level_a_1 = self.__nr_levels(self.atom1.atomic_number)
-        level_a_2 = self.__nr_levels(self.atom2.atomic_number)
-
-        self.atom1.e = diag[0:level_a_1]
-
-        if nr_a1 == 1:
-            self.atom2.e = diag[level_a_1:level_a_1+level_a_2]
-        else:
-            self.atom2.e = diag[nr_a1*level_a_1:nr_a1*level_a_1+level_a_2]
-
-        return self
-
-    def __nr_levels(self, atomic_number):
-
-        if atomic_number <= 2:
-            return 1
-        elif atomic_number <= 4:
-            return 2
-        elif atomic_number <= 10:
-            return 5
-        elif atomic_number <= 12:
-            return 6
-        elif atomic_number <= 18:
-            return 9
-        else:
-            raise Exception("Higher atomic numbers not yet supported")
 
     def from_json(self, json):
         """
