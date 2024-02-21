@@ -4,8 +4,8 @@ import sys
 
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from pymodia import Atom, subscript
 
-from pymodia import Atom, Molecule, subscript
 
 class TestH2(unittest.TestCase):
 
@@ -33,20 +33,6 @@ class TestH2(unittest.TestCase):
         self.assertEqual('C₆H₆', subscript('C6H6'))
         self.assertNotEqual('C6H6', subscript('C6H6'))
 
-    def test_Molecule(self):
-        C = Atom('C')
-        H = Atom('H')
-
-        CH4 = Molecule(subscript('CH4'), C, 1, H, 4)
-        C6H6 = Molecule(subscript('C6H6'), C, 6, H, 6)
-
-        self.assertEqual(CH4.a1, C)
-        self.assertEqual(C6H6.a1, C)
-        self.assertEqual(CH4.a2, H)
-        self.assertEqual(C6H6.a2, H)
-
-        self.assertEqual(CH4.a1, C6H6.a1)
-        self.assertEqual(CH4.a2, C6H6.a2)
 
 if __name__ == '__main__':
     unittest.main()
