@@ -38,7 +38,7 @@ class MoDiaSettings():
         self.energy_scale_color = '#000000'
         self.energy_scale_labels = None
         self.energy_scale_style = 'mo'
-        self.font_family = 'Noto Sans'
+        self.font_family = 'Open Sans'
         self.font_size = 10
         self.height = 600
         self.label_significant_digits = 3

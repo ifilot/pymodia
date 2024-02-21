@@ -3,10 +3,9 @@ import filecmp
 import os
 import sys
 
-# add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from pymodia import PyMoDia, Atom, Molecule, subscript
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 
 class TestH2(unittest.TestCase):
     @classmethod
@@ -17,28 +16,20 @@ class TestH2(unittest.TestCase):
         mo_energies = [-0.58, 0.67]
         orbc = [[-0.55, -0.55], [1.21, -1.21]]
 
+        # Setting up PyMoDia objects
         H = Atom("H", [-0.08])
-
         Mol_name = subscript("H2")
+        Mol = MoDiaMolecule(Mol_name, H, 1, H, 1)
 
-        Mol = Molecule(Mol_name, H, 1, H, 1)
+        H2 = MoDiaData(molecule=Mol, moe=mo_energies, orbc=orbc)
 
-        core_cutoff = -10
-        contribution_cutoff = 0.3
+        diagram = MoDia(H2, outer_height=200, core_height=20, height=320,
+                        mo_color=['#1aa7ec', '#1aa7ec'], draw_orbc=True,
+                        mo_labels=['σ', 'σ*'], draw_level_labels=True,
+                        level_labels_style='mo')
 
-        outer_height = 200
-        core_height = 20
-        height = outer_height+core_height+100
-
-        mo_colors = ["#1aa7ec", "#1aa7ec"]
-
-        diagram = PyMoDia(Mol, mo_energies, orbc, outer_height=outer_height,
-                          core_height=core_height, height=height,
-                          core_cutoff=core_cutoff)
-        diagram.draw_levels(colors_mo=mo_colors)
-        diagram.draw_occupancies()
-        diagram.draw_contributions(contribution_cutoff, print_coeff=True)
-        diagram.image.save_svg(os.path.join('tests', 'h2_test_results.svg'))
+        # Save image
+        diagram.export_svg(os.path.join('tests', 'h2_test_results.svg'))
 
     def test_H2_svg(self):
         """

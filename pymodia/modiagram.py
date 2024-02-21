@@ -43,11 +43,17 @@ class MoDia():
         Draws the mo diagram according to the settings of the object
 
         """
+        font_family = self.settings.font_family
+
         # initialise image
-        self.image = draw.Drawing(self.settings.width, self.settings.height)
+        self.image = draw.Drawing(
+            self.settings.width, self.settings.height, font_family=font_family)
 
         # embed font from google
-        self.image.embed_google_font(self.settings.font_family)
+        imprt_symbs = "1234567890 ₀₁₂₃₄₅₆₇₈₉ ⁰¹²³⁴⁵⁶⁷⁸⁹\
+            ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdsefghiklmnopqrstuvwxyz\
+                σ π *"
+        self.image.embed_google_font(font_family, text=imprt_symbs)
 
         # add background
         if self.settings.draw_background:
@@ -80,8 +86,8 @@ class MoDia():
             self.__draw_contributions()
 
         # add energy labels
+        self.__draw_energy_scale()
         if self.settings.draw_energy_labels:
-            self.__draw_energy_scale()
             self.__draw_energy_labels()
 
         # add labelling to levels
@@ -144,6 +150,14 @@ class MoDia():
         mo_outer = self.__mo_outer
         ao1_outer = self.__ao1_outer
         ao2_outer = self.__ao2_outer
+
+        # Notifying user
+        if nr_a1 >= 6:
+            print('Number of atoms 1 >= 6, only one set of atomic orbtials is '
+                  'drawn')
+        if nr_a2 >= 6:
+            print('Number of atoms 2 >= 6, only one set of atomic orbtials is '
+                  'drawn')
 
         # Finding lowest core orbital
         if len(mo_core) >= 1:
@@ -252,6 +266,9 @@ class MoDia():
         margin = self.settings.margin
         multiplicty_offset = self.settings.multiplicty_offset
 
+        nr_a1 = self.data.atom1.nr
+        nr_a2 = self.data.atom2.nr
+
         if column == 'mo':
             orbe_x_start = [0.5*width + 0.5*margin - 0.5*level_width for x in
                             s_orbe]
@@ -277,25 +294,30 @@ class MoDia():
         i = 0
         orbe_multiplicity_heights = [0]*len(orbe_heights)
 
+        if column == 'ao1' and nr_a1 >= 6:
+            occurance = [int(occ/nr_a1) for occ in occurance]
+        if column == 'ao2' and nr_a2 >= 6:
+            occurance = [int(occ/nr_a1) for occ in occurance]
+
         for o in occurance:
             if o == 1:
                 orbe_multiplicity_heights[i] = orbe_heights[i]
 
                 i = i+1
-            if o == 2:
+            elif o == 2:
                 orbe_multiplicity_heights[i] = orbe_heights[i] - \
                     0.5*multiplicty_offset
                 orbe_multiplicity_heights[i+1] = orbe_heights[i] + \
                     0.5*multiplicty_offset
                 i = i+2
-            if o == 3:
+            elif o == 3:
                 orbe_multiplicity_heights[i] = orbe_heights[i] - \
                     multiplicty_offset
                 orbe_multiplicity_heights[i+1] = orbe_heights[i]
                 orbe_multiplicity_heights[i+2] = orbe_heights[i] + \
                     multiplicty_offset
                 i = i+3
-            if o == 4:
+            elif o == 4:
                 orbe_multiplicity_heights[i] = orbe_heights[i] - \
                     1.5*multiplicty_offset
                 orbe_multiplicity_heights[i+1] = orbe_heights[i] - \
@@ -305,7 +327,7 @@ class MoDia():
                 orbe_multiplicity_heights[i+3] = orbe_heights[i] + \
                     1.5*multiplicty_offset
                 i = i+4
-            if o == 5:
+            elif o == 5:
                 orbe_multiplicity_heights[i] = orbe_heights[i] - \
                     2*multiplicty_offset
                 orbe_multiplicity_heights[i+1] = orbe_heights[i] - \
@@ -316,7 +338,7 @@ class MoDia():
                 orbe_multiplicity_heights[i+4] = orbe_heights[i] + \
                     2*multiplicty_offset
                 i = i+5
-            if o == 6:
+            elif o == 6:
                 orbe_multiplicity_heights[i] = orbe_heights[i] - \
                     2.5*multiplicty_offset
                 orbe_multiplicity_heights[i+1] = orbe_heights[i] - \
@@ -330,6 +352,10 @@ class MoDia():
                 orbe_multiplicity_heights[i+5] = orbe_heights[i] + \
                     2.5*multiplicty_offset
                 i = i+6
+            elif o > 6:
+                # print('Multiplicity > 6 not supported, one level drawn')
+                orbe_multiplicity_heights[i] = orbe_heights[i]
+                i = i+1
 
         loct_dict = self.__append_loct_dict(loct_dict, orbe_x_start,
                                             orbe_x_end, orbe_heights,
@@ -380,20 +406,26 @@ class MoDia():
         if len(colors) == 1:
             if isinstance(colors, list):
                 for j in range(len(loc_dict['xb'])):
-                    self.image.append(draw.Line(loc_dict['xb'][j],
-                                                loc_dict['ymb'][j],
-                                                loc_dict['xe'][j],
-                                                loc_dict['yme'][j],
-                                                stroke=colors[0],
-                                                stroke_width=line_width))
+                    if loc_dict['ymb'][j] == 0:
+                        pass
+                    else:
+                        self.image.append(draw.Line(loc_dict['xb'][j],
+                                                    loc_dict['ymb'][j],
+                                                    loc_dict['xe'][j],
+                                                    loc_dict['yme'][j],
+                                                    stroke=colors[0],
+                                                    stroke_width=line_width))
             elif isinstance(colors, str):
                 for j in range(len(loc_dict['xb'])):
-                    self.image.append(draw.Line(loc_dict['xb'][j],
-                                                loc_dict['ymb'][j],
-                                                loc_dict['xe'][j],
-                                                loc_dict['yme'][j],
-                                                stroke=colors,
-                                                stroke_width=line_width))
+                    if loc_dict['ymb'][j] == 0:
+                        pass
+                    else:
+                        self.image.append(draw.Line(loc_dict['xb'][j],
+                                                    loc_dict['ymb'][j],
+                                                    loc_dict['xe'][j],
+                                                    loc_dict['yme'][j],
+                                                    stroke=colors,
+                                                    stroke_width=line_width))
         else:
             if len(colors) < len(loc_dict['xb']):
                 raise ValueError(
@@ -401,12 +433,15 @@ class MoDia():
                     % len(loc_dict['xb']))
 
             for j in range(len(loc_dict['xb'])):
-                self.image.append(draw.Line(loc_dict['xb'][j],
-                                            loc_dict['ymb'][j],
-                                            loc_dict['xe'][j],
-                                            loc_dict['yme'][j],
-                                            stroke=colors[j],
-                                            stroke_width=line_width))
+                if loc_dict['ymb'][j] == 0:
+                    pass
+                else:
+                    self.image.append(draw.Line(loc_dict['xb'][j],
+                                                loc_dict['ymb'][j],
+                                                loc_dict['xe'][j],
+                                                loc_dict['yme'][j],
+                                                stroke=colors[j],
+                                                stroke_width=line_width))
 
     def __draw_names(self, names_font_size=14):
         """
@@ -423,39 +458,33 @@ class MoDia():
         margin = self.settings.margin
         level_width = self.settings.level_width
 
-        font_family = self.settings.font_family
         color = self.settings.name_color
 
         if nr_a1 == 1:
             self.image.append(draw.Text(
                 name_a1, names_font_size,
                 (2*margin + 0.5*level_width),
-                (height-0.5*margin), center=True,
-                font_family=font_family, fill=color))
+                (height-0.5*margin), center=True, fill=color))
         else:
             self.image.append(draw.Text(
                 (str(nr_a1) + 'x' + name_a1),
                 names_font_size, (2*margin + 0.5*level_width),
-                (height - 0.5*margin), center=True,
-                font_family=font_family, fill=color))
+                (height - 0.5*margin), center=True, fill=color))
 
         if nr_a2 == 1:
             self.image.append(draw.Text(
                 name_a2, names_font_size,
                 (width - (margin + 0.5*level_width)),
-                (height - 0.5*margin), center=True,
-                font_family=font_family, fill=color))
+                (height - 0.5*margin), center=True, fill=color))
         else:
             self.image.append(draw.Text(
                 (str(nr_a2) + 'x' + name_a2),
                 names_font_size, (width - (margin + 0.5*level_width)),
-                (height - 0.5*margin), center=True,
-                font_family=font_family, fill=color))
+                (height - 0.5*margin), center=True, fill=color))
 
         self.image.append(draw.Text(
             name_mol, names_font_size, (0.5*width + 0.5*margin),
-            (height - 0.5*margin), center=True, font_family=font_family,
-            fill=color))
+            (height - 0.5*margin), center=True, fill=color))
 
     def __draw_configuration(self, configuration_font_size=12):
         """
@@ -469,23 +498,18 @@ class MoDia():
         margin = self.settings.margin
         level_width = self.settings.level_width
 
-        font_family = self.settings.font_family
         color = self.settings.name_color
 
         self.image.append(draw.Text(config_a1,
                                     configuration_font_size,
                                     (2*margin + 0.5 * level_width),
                                     (height - 0.25*margin),
-                                    center=True,
-                                    font_family=font_family,
-                                    fill=color))
+                                    center=True, fill=color))
         self.image.append(draw.Text(config_a2,
                                     configuration_font_size,
                                     (width - (margin + 0.5*level_width)),
                                     (height - 0.25*margin),
-                                    center=True,
-                                    font_family=font_family,
-                                    fill=color))
+                                    center=True, fill=color))
 
     def __draw_box(self):
         """
@@ -507,7 +531,7 @@ class MoDia():
                 (width - 3*margin+40),
                 (core_height + 37), fill_opacity=0, stroke=color))
         else:
-            raise Exception('no box around core drawn, no level in core')
+            print('no box around core drawn, no level in core')
 
     def __draw_occupancies(self):
         """
@@ -537,16 +561,28 @@ class MoDia():
         self.__arrow = arrow
 
         # Drawing the occupancies
-        ao1_e_count = anr_a1 * nr_a1
-        ao2_e_count = anr_a2 * nr_a2
-        mo_e_count = ao1_e_count + ao2_e_count
+        if nr_a1 >= 6:
+            ao1_e_count = anr_a1
+        else:
+            ao1_e_count = anr_a1 * nr_a1
+
+        if nr_a2 >= 6:
+            ao2_e_count = anr_a2
+        else:
+            ao2_e_count = anr_a2 * nr_a2
+
+        mo_e_count = anr_a1 * nr_a1 + anr_a2 * nr_a2
 
         # atom 1 levels
         for e in range(len(ao1_loc['ye'])):
-            nr_levels = ao1_loc['ye'].count(ao1_loc['ye'][e])
-            if (ao1_loc['ye'][e] == ao1_loc['yme'][e]) or \
-                ((ao1_loc['ye'][e]) ==
-                 (ao1_loc['yme'][e] - 0.5*multiplicty_offset)):
+            if nr_a1 >= 6:
+                nr_levels = int(ao1_loc['ye'].count(ao1_loc['ye'][e])/nr_a1)
+            else:
+                nr_levels = ao1_loc['ye'].count(ao1_loc['ye'][e])
+
+            if ((ao1_loc['ye'][e] == ao1_loc['yme'][e]) or
+                (ao1_loc['ye'][e] ==
+                 (ao1_loc['yme'][e]-0.5*multiplicty_offset))):
                 if ao1_e_count >= 2*nr_levels:
                     nr_e = 2*nr_levels
                 else:
@@ -558,7 +594,11 @@ class MoDia():
 
         # atom 2 levels
         for e in range(len(ao2_loc['ye'])):
-            nr_levels = ao2_loc['ye'].count(ao2_loc['ye'][e])
+            if nr_a2 >= 6:
+                nr_levels = int(ao2_loc['ye'].count(ao2_loc['ye'][e])/nr_a2)
+            else:
+                nr_levels = ao2_loc['ye'].count(ao2_loc['ye'][e])
+
             if ((ao2_loc['ye'][e] == ao2_loc['yme'][e]) or
                 (ao2_loc['ye'][e] ==
                  (ao2_loc['yme'][e]-0.5*multiplicty_offset))):
@@ -612,6 +652,19 @@ class MoDia():
                 self.__draw_arrow_set(level_loc_x+0.5*x_space, level_loc_y)
                 self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
                 self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
+            elif nr_levels == 5:
+                self.__draw_arrow_set(level_loc_x+2*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-2*x_space, level_loc_y)
+            elif nr_levels == 6:
+                self.__draw_arrow_set(level_loc_x+2.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+1.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x+0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-0.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-1.5*x_space, level_loc_y)
+                self.__draw_arrow_set(level_loc_x-2.5*x_space, level_loc_y)
         elif nr_elec <= nr_levels:
             # only partial occupied levels
             if nr_elec == 1:
@@ -704,7 +757,6 @@ class MoDia():
         linestyle = self.settings.orbc_linestyle
         color = self.settings.orbc_color
         font_size = self.settings.orbc_font_size
-        font_family = self.settings.font_family
 
         orbc = np.transpose(self.data.orbc)
         ao1_loc = self.__ao1_loc
@@ -738,25 +790,21 @@ class MoDia():
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=-0.4, fill=color))
                             elif path_memory.count(p) == 2:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=1, fill=color))
                             elif path_memory.count(p) == 3:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=2, fill=color))
                             elif path_memory.count(p) == 4:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=-1.4, fill=color))
                     elif (j > ao1_end_index):
                         p = draw.Line(mo_loc['xe'][i],
@@ -776,25 +824,21 @@ class MoDia():
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=-0.4, fill=color))
                             elif path_memory.count(p) == 2:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=1, fill=color))
                             elif path_memory.count(p) == 3:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=2, fill=color))
                             elif path_memory.count(p) == 4:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
-                                    font_family=font_family,
                                     line_offset=-1.4, fill=color))
 
     def __draw_energy_scale(self):
@@ -808,7 +852,6 @@ class MoDia():
         """
         margin = self.settings.margin
         height = self.settings.height
-        font_family = self.settings.font_family
         font_size = self.settings.font_size
 
         unit = self.settings.unit
@@ -826,19 +869,16 @@ class MoDia():
         self.image.append(draw.Text('Energy', font_size,
                                     3, 20,
                                     center=True, text_anchor='begin',
-                                    font_family=font_family,
                                     fill=color))
         if unit == 'Hartree':
             self.image.append(draw.Text('(Hartree)', font_size,
                                         3, 35,
                                         center=True, text_anchor='begin',
-                                        font_family=font_family,
                                         fill=color))
         elif unit == 'Ht':
             self.image.append(draw.Text('(Ht)', font_size,
                                         3, 35,
                                         center=True, text_anchor='begin',
-                                        font_family=font_family,
                                         fill=color))
         else:
             raise NotImplementedError('Other units are not yet implemented')
@@ -916,7 +956,6 @@ class MoDia():
         core_cutoff = self.settings.core_cutoff
         significant_digits = self.settings.label_significant_digits
 
-        font_family = self.settings.font_family
         font_size = self.settings.font_size
         color = self.settings.energy_scale_color
 
@@ -926,8 +965,7 @@ class MoDia():
             t = draw.Text(str(round(labels[j], significant_digits)),
                           font_size,
                           x, loc_dict['yb'][j],
-                          center=True, text_anchor='end',
-                          font_family=font_family, fill=color)
+                          center=True, text_anchor='end', fill=color)
             text_memory.append(t)
             if core:
                 if text_memory.count(t) == 1:
@@ -973,7 +1011,6 @@ class MoDia():
         """
         mo_loc = self.__mo_loc
         font_size = self.settings.font_size
-        font_family = self.settings.font_family
         color = self.settings.main_color
 
         label_memory = []
@@ -984,8 +1021,7 @@ class MoDia():
             label = draw.Text(labels[j],
                               font_size,
                               x, mo_loc['ymb'][j]+10,
-                              center=True, text_anchor='end',
-                              font_family=font_family, fill=color)
+                              center=True, text_anchor='end', fill=color)
             label_memory.append(label)
             y = mo_loc['yb'][j]
             y_memory.append(y)
@@ -1011,7 +1047,6 @@ class MoDia():
         """
         ao1_loc = self.__ao1_loc
         font_size = self.settings.font_size
-        font_family = self.settings.font_family
         color = self.settings.main_color
 
         label_memory = []
@@ -1021,7 +1056,7 @@ class MoDia():
                               font_size,
                               x, ao1_loc['yb'][j],
                               center=True, text_anchor='end',
-                              font_family=font_family, fill=color)
+                              fill=color)
             label_memory.append(label)
             if label_memory.count(label) == 1:
                 self.image.append(label)
@@ -1032,7 +1067,6 @@ class MoDia():
         """
         ao2_loc = self.__ao2_loc
         font_size = self.settings.font_size
-        font_family = self.settings.font_family
         color = self.settings.main_color
 
         label_memory = []
@@ -1042,7 +1076,7 @@ class MoDia():
                               font_size,
                               x, ao2_loc['yb'][j],
                               center=True, text_anchor='begin',
-                              font_family=font_family, fill=color)
+                              fill=color)
             label_memory.append(label)
             if label_memory.count(label) == 1:
                 self.image.append(label)

@@ -25,7 +25,6 @@ C = Atom("C", diag[0:5])
 H = Atom("H", [diag[5]])
 molname = subscript("CH4")
 Mol = MoDiaMolecule(molname, C, 1, H, 4)
-print(diag[0:5])
 
 CH4 = MoDiaData(molecule=Mol, moe=res['orbe'], orbc=res['orbc'])
 
@@ -36,7 +35,7 @@ mo_c = ['#000000', '#785EF0', '#fe6100', '#fe6100', '#fe6100', '#785EF0',
 diagram = MoDia(CH4, ao1_color=ao1_c, ao2_color=ao2_c, mo_color=mo_c,
                 draw_level_labels=True, level_labels_style='mo_ao',
                 mo_labels=['1s', '1σ', '1π', '1π', '1π',
-                           '2σ*', '2π*', '2π*', '2π*'])
+                           '1σ*', '1π*', '1π*', '1π*'])
 
 # Save image
 diagram.export_svg(os.path.join(
