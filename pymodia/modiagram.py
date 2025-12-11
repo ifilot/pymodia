@@ -152,11 +152,11 @@ class MoDia():
         ao2_outer = self.__ao2_outer
 
         # Notifying user
-        if nr_a1 >= 6:
-            print('Number of atoms 1 >= 6, only one set of atomic orbtials is '
+        if nr_a1 >= 2 and self.data.atom1.name != "H":
+            print('Number of atoms 1 >= 2, only one set of atomic orbtials is '
                   'drawn')
-        if nr_a2 >= 6:
-            print('Number of atoms 2 >= 6, only one set of atomic orbtials is '
+        if nr_a2 >= 2 and self.data.atom2.name != "H":
+            print('Number of atoms 2 >= 2, only one set of atomic orbtials is '
                   'drawn')
 
         # Finding lowest core orbital
@@ -294,9 +294,9 @@ class MoDia():
         i = 0
         orbe_multiplicity_heights = [0]*len(orbe_heights)
 
-        if column == 'ao1' and nr_a1 >= 6:
+        if column == 'ao1' and nr_a1 >= 2 and self.data.atom1.name != "H":
             occurance = [int(occ/nr_a1) for occ in occurance]
-        if column == 'ao2' and nr_a2 >= 6:
+        if column == 'ao2' and nr_a2 >= 2 and self.data.atom2.name != "H":
             occurance = [int(occ/nr_a1) for occ in occurance]
 
         for o in occurance:
@@ -561,12 +561,12 @@ class MoDia():
         self.__arrow = arrow
 
         # Drawing the occupancies
-        if nr_a1 >= 6:
+        if nr_a1 >= 2 and self.data.atom1.name != "H":
             ao1_e_count = anr_a1
         else:
             ao1_e_count = anr_a1 * nr_a1
 
-        if nr_a2 >= 6:
+        if nr_a2 >= 2 and self.data.atom2.name != "H":
             ao2_e_count = anr_a2
         else:
             ao2_e_count = anr_a2 * nr_a2
@@ -575,7 +575,7 @@ class MoDia():
 
         # atom 1 levels
         for e in range(len(ao1_loc['ye'])):
-            if nr_a1 >= 6:
+            if nr_a1 >= 2 and self.data.atom1.name != "H":
                 nr_levels = int(ao1_loc['ye'].count(ao1_loc['ye'][e])/nr_a1)
             else:
                 nr_levels = ao1_loc['ye'].count(ao1_loc['ye'][e])
@@ -594,7 +594,7 @@ class MoDia():
 
         # atom 2 levels
         for e in range(len(ao2_loc['ye'])):
-            if nr_a2 >= 6:
+            if nr_a2 >= 2 and self.data.atom2.name != "H":
                 nr_levels = int(ao2_loc['ye'].count(ao2_loc['ye'][e])/nr_a2)
             else:
                 nr_levels = ao2_loc['ye'].count(ao2_loc['ye'][e])
@@ -1032,26 +1032,23 @@ class MoDia():
                 unique_y.append(y)
 
         for y in unique_y:
-            if y_memory.count(y) == 1:
-                self.image.append(label_memory[y_memory.index(y)])
-            if y_memory.count(y) == 2:
-                self.image.append(label_memory[y_memory.index(y)])
-            if y_memory.count(y) == 3:
-                self.image.append(label_memory[y_memory.index(y)+1])
-            if y_memory.count(y) == 4:
-                self.image.append(label_memory[y_memory.index(y)+1])
+            count = y_memory.count(y)
+            self.image.append(label_memory[y_memory.index(y) + count - 1])
 
     def __draw_ao1_labels(self, labels):
         """
         Adds labels to atomic orbitals of atom 1
         """
+        nr_a1 = self.data.atom1.nr
         ao1_loc = self.__ao1_loc
         font_size = self.settings.font_size
         color = self.settings.main_color
 
+        lvls = int(len(ao1_loc['xb'])/nr_a1)
+
         label_memory = []
         x = ao1_loc['xb'][0]-2
-        for j in range(len(ao1_loc['xb'])):
+        for j in range(lvls):
             label = draw.Text(labels[j],
                               font_size,
                               x, ao1_loc['yb'][j],
@@ -1065,13 +1062,16 @@ class MoDia():
         """
         Adds labels to atomic orbitals of atom 2
         """
+        nr_a2 = self.data.atom2.nr
         ao2_loc = self.__ao2_loc
         font_size = self.settings.font_size
         color = self.settings.main_color
 
+        lvls = int(len(ao2_loc['xb'])/nr_a2)
+
         label_memory = []
         x = ao2_loc['xe'][0]+2
-        for j in range(len(ao2_loc['xb'])):
+        for j in range(lvls):
             label = draw.Text(labels[j],
                               font_size,
                               x, ao2_loc['yb'][j],

@@ -35,4 +35,4 @@ diagram = MoDia(N2, orbc_cutoff=0.9, mo_color=mo_colors, ao1_color=ao_colors,
 
 # Save image
 diagram.export_svg(os.path.join(
-    os.path.dirname(__file__), "N2_mo_diagram.svg"))
+    os.path.dirname(__file__), "N2_qualitative.svg"))
