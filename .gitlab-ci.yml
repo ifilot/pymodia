@@ -25,7 +25,7 @@ documentation:
     - pushd docs && make html && popd
   artifacts:
     paths:
-      - docs/_build/html/
+      - docs/_build/html/ls
     expire_in: 1 hour
 
 pages:
