@@ -12,8 +12,8 @@ debian-test:
 pypi-compilation:
   needs: ["debian-test"]
   image: python:3.11-slim-bullseye
-    - pip install build
   script:
+    - pip install build
     - python -m build
   artifacts:
     paths:
