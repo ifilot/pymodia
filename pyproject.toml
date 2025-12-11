@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymodia"
+version = "0.2.1"
+authors = [
+  { name="Ivo Filot", email="ivo@ivofilot.nl" }
+]
+maintainers = [
+    { name="Ivo Filot", email="ivo@ivofilot.nl" },
+]
+description = "pymodia"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "GPL-3.0-or-later"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "drawsvg",
+]

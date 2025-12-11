@@ -148,6 +148,10 @@ wheelhouse/*
 test.py
 nose_debug
 anaconda-upload/*
+<<<<<<< HEAD
 
 # VS code
 .vscode
+=======
+.venv*
+>>>>>>> e8f353ff8c536f70cdfe6b5933f454f01b163c18

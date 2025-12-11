@@ -1,11 +1,6 @@
 image: debian:stable
 
-stages:
-  - test
-  - staging
-
 debian-test:
-  stage: test
   before_script:
     - apt update && apt -y install python3-full         # install Python
     - python3 -m venv /venv                             # create a virtual environment
@@ -14,8 +9,17 @@ debian-test:
   script: # explicitly write out all cases to run
     - pytest tests/*.py
 
+pypi-compilation:
+  needs: ["debian-test"]
+  image: python:3.11-slim-bullseye
+    - pip install build
+  script:
+    - python -m build
+  artifacts:
+    paths:
+      - dist/pymodia-*.whl
+
 documentation:
-  stage: staging
   image: ghcr.io/ifilot/sphinx:v0.4.0 # custom Sphinx image
   script:
     - pushd docs && make html && popd
@@ -23,3 +27,16 @@ documentation:
     paths:
       - docs/_build/html/
     expire_in: 1 hour
+
+pages:
+  needs: ["documentation"]
+  only:
+    refs:
+      - master
+  script:
+    - cp -rv docs/_build/html/ public
+  dependencies:
+    - documentation
+  artifacts:
+    paths:
+      - public

@@ -1,9 +1,10 @@
-from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 import pyqint
 import os
 import sys
 import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 
 # PyQInt calculations
 mol = pyqint.MoleculeBuilder().from_name('benzene')
