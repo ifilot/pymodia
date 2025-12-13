@@ -23,6 +23,30 @@ at https://pymodia.imc-tue.nl.
 
 ## Installation
 
+PyMODIA is best used in its own environment which can be created and activated
+via
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install PyMODIA via
+
+```bash
+pip install -e .
+```
+
+The `-e` directive ensures that if you make changes to the PyMODIA sources,
+they will be automatically propagated to the environment.
+
+Besides, `numpy` and `drawsvg` as the core dependencies, we recommend also
+installing `pyqint` and `pydft` to run the majority of the examples.
+
+```bash
+pip install pyqint pydft
+```
+
 ### Dependencies
 
 * [NumPy](https://numpy.org/)

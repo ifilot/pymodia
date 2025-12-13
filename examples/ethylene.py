@@ -1,9 +1,9 @@
-from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 import pyqint
 import os
 import sys
 import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 
 # PyQInt calculations
 mol = pyqint.MoleculeBuilder().from_name('ethylene')
@@ -20,12 +20,6 @@ H = Atom("H", [-0.46])
 molname = subscript("Ethylene")
 Mol = MoDiaMolecule(molname, C, 2, H, 4)
 
-
-ao1 = ['#000000']
-ao2 = ['#785EF0']
-mo_canonical = ['#000000']
-mo_local = ['#000000']
-
 # Canonical diagram
 C2H4_canonical = MoDiaData(molecule=Mol, moe=res['orbe'], orbc=res['orbc'])
 canonical = MoDia(C2H4_canonical)
@@ -38,6 +32,6 @@ local = MoDia(C2H4_local, draw_level_labels=True, level_labels_style='mo_ao',
 
 # Save images
 canonical.export_svg(os.path.join(
-    os.path.dirname(__file__), "Ethylene_canonical.svg"))
+    os.path.dirname(__file__), "mo_ethylene_canonical.svg"))
 local.export_svg(os.path.join(
-    os.path.dirname(__file__), "Ethylene_localized.svg"))
+    os.path.dirname(__file__), "mo_ethylene_localized.svg"))

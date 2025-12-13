@@ -8,5 +8,4 @@ from .molecule import MoDiaMolecule
 from .data import MoDiaData
 from .modiagram import MoDia
 
-
 from ._version import __version__

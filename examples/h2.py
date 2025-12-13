@@ -1,7 +1,8 @@
-from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 import os
 import sys
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 
 # MO data
 mo_energies = [-0.58, 0.67]
