@@ -1,37 +1,49 @@
-import pyqint
 import os
-import sys
-import numpy as np
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
+from pymodia import MoDia, MoDiaData, Atom, MoDiaMolecule, subscript, MoDiaSettings
+from pyqint import MoleculeBuilder, HF, FosterBoys
 
-# PyQInt calculations
-mol = pyqint.MoleculeBuilder().from_name('ethylene')
+# Perform PyQInt calculations for CO and its localization
+mol = MoleculeBuilder().from_name('ethylene')
+res = HF().rhf(mol, 'sto3g')
+resfb = FosterBoys(res).run()
 
-cgfs, atoms = mol.build_basis('sto3g')
-res = pyqint.HF().rhf(mol, basis='sto3g')
-resfb = pyqint.FosterBoys(res).run()
+# Setting up MoDia objects
+C = Atom("C")
+H = Atom("H")
+mol_name = subscript("ethylene")
+mol = MoDiaMolecule(mol_name, C, 2, H, 4)
 
-# Setting up PyMoDia objects
-diag = np.diagonal(res['fock']).tolist()
-e = [-11.02, -1.54, -0.27, -0.27, -0.27]
-C = Atom("C", e)
-H = Atom("H", [-0.46])
-molname = subscript("Ethylene")
-Mol = MoDiaMolecule(molname, C, 2, H, 4)
+# adjust settings
+settings = MoDiaSettings()
+settings.orbc_color = '#555555'
+settings.arrow_color = '#CC0000'
+settings.ao_round = 2
+settings.orbc_cutoff = 0.35
 
-# Canonical diagram
-C2H4_canonical = MoDiaData(molecule=Mol, moe=res['orbe'], orbc=res['orbc'])
-canonical = MoDia(C2H4_canonical)
+# making diagram for canonical orbitals
+moe = res['orbe']
+print(moe)
+co_data = MoDiaData(molecule=mol, moe=moe, orbc=res['orbc'])
+# we make here a small adjustment to avoid overlap in the diagram
+moe[4] -= 0.05
+moe[6] += 0.1
+moe[7] += 0.1
+moe[11] += 0.1
+co_data.set_moe(moe)
+labels = [''] * len(res['orbe'])
+diagram = MoDia(co_data, draw_level_labels=True, level_labels_style='mo_ao',
+                mo_labels=labels,
+                settings=settings)
+diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_ethylene_canonical.svg"))
 
-# localized diagram
-C2H4_local = MoDiaData(molecule=Mol, moe=resfb['orbe'], orbc=resfb['orbc'])
-local = MoDia(C2H4_local, draw_level_labels=True, level_labels_style='mo_ao',
-              mo_labels=['1s', '1s', 'C-H', 'C-H', 'C-H', 'C-H',
-                         'double bond', 'double bond', '', '', '', '', '', '', '', '', '', ''])
-
-# Save images
-canonical.export_svg(os.path.join(
-    os.path.dirname(__file__), "mo_ethylene_canonical.svg"))
-local.export_svg(os.path.join(
-    os.path.dirname(__file__), "mo_ethylene_localized.svg"))
+# making diagram for localized orbitals
+moe = resfb['orbe']
+co_data = MoDiaData(molecule=mol, moe=moe, orbc=resfb['orbc'])
+# we make here a small adjustment to avoid overlap in the diagram
+moe[6] += 0.1
+moe[7] += 0.1
+moe[11] += 0.1
+co_data.set_moe(moe)
+diagram = MoDia(co_data, draw_level_labels=True, level_labels_style='mo_ao',
+                mo_labels=[[]] * len(resfb['orbe']), settings=settings)
+diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_ethylene_localized.svg"))

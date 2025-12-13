@@ -47,17 +47,16 @@ installing `pyqint` and `pydft` to run the majority of the examples.
 pip install pyqint pydft
 ```
 
-### Dependencies
-
-* [NumPy](https://numpy.org/)
-* [Drawsvg](https://github.com/cduck/drawsvg)
-
-### PyPi
-
-To be written
-
 ## Features
 
 * Highly customisable
 * Qualitative MO diagrams
 * Quantatative MO diagrams
+
+## Gallery
+
+![MO diagram for canonical MO of CO](img/mo_co_canonical.png)![MO diagram for localized MO of CO](img/mo_co_localized.png)
+
+![MO diagram for canonical MO of CH4](img/mo_ch4_canonical.png)![MO diagram for localized MO of CH4](img/mo_ch4_localized.png)
+
+![MO diagram for canonical MO of ethylene](img/mo_ethylene_canonical.png)![MO diagram for localized MO of ethylene](img/mo_ethylene_localized.png)

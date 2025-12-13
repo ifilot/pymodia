@@ -1,9 +1,5 @@
 import pyqint
 import os
-import sys
-import numpy as np
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
 from pymodia import MoDia, MoDiaData, MoDiaMolecule, Atom, subscript
 
 # PyQInt calculations
@@ -22,5 +18,4 @@ benzene = MoDiaData(
 diagram = MoDia(benzene, height=800, outer_height=600, level_width=80)
 
 # Save image
-diagram.export_svg(os.path.join(
-    os.path.dirname(__file__), "benzene_mo_diagram.svg"))
+diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_benzene.svg"))
