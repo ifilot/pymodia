@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymodia"
-version = "0.2.1"
+version = "0.3.0"
 authors = [
   { name="Ivo Filot", email="ivo@ivofilot.nl" }
 ]
@@ -24,3 +24,6 @@ dependencies = [
     "numpy",
     "drawsvg",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]

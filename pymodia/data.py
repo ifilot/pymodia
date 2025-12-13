@@ -16,6 +16,15 @@ class MoDiaData():
         if 'molecule' in kwargs:
             self.set_molecule(kwargs['molecule'])
 
+        # When loading the molecular orbital (MO) energies, a copy is made of the
+        # raw energies and used to set the energy labels. The user can now
+        # overwrite the MO energies which will adjust the position where the
+        # MOs are being plotted, but will conserve the energies. This allows
+        # the user to make small adjustment to the energy levels to avoid
+        # any form of overlapping.
+        if hasattr(self, "moe"):
+            self.moe_labels = [float(e) for e in self.moe]
+
     def set_ao_energy(self, atom_index, energies):
         """
         Set the atomic orbital energies of atom 1 or atom 2
@@ -51,6 +60,20 @@ class MoDiaData():
 
         self.atom1.e = energies[0]
         self.atom2.e = energies[1]
+
+        return self
+
+    def set_moe(self, moe):
+        """
+        Overwrite MO energies. Used to adjust the position of the MO energies
+        in the diagram while retaining the actual energy values.
+
+        Parameters
+        ----------
+        moe : lst
+            List of MO energies
+        """
+        self.moe = moe
 
         return self
 

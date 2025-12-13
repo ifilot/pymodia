@@ -1,26 +1,11 @@
-# add a reference to load the PyMOdia library
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
+import os
 from pymodia import MoDia, MoDiaData, Atom, MoDiaMolecule, subscript, MoDiaSettings
 from pyqint import MoleculeBuilder, HF, FosterBoys
-import numpy as np
 
-# PyQInt calculations
+# Perform PyQInt calculations for CO and its localization
 mol = MoleculeBuilder().from_name('co')
 res = HF().rhf(mol, 'sto3g')
 resfb = FosterBoys(res).run()
-
-# Rounding PyQInt results for MoDia
-mo_energies = np.round(res['orbe'], 3)
-orbc = np.round(res['orbc'], 3)
-
-# Keeping original energy levels for energy bar
-energies = mo_energies.copy()
-
-# # Increase distance of 5sigma
-mo_energies[3] -= 0.1
-mo_energies[6] += 0.2
 
 # Setting up MoDia objects
 C = Atom("C")
@@ -34,14 +19,24 @@ settings.orbc_color = '#555555'
 settings.arrow_color = '#CC0000'
 
 # making diagram for canonical orbitals
-co_data = MoDiaData(molecule=mol, moe=res['orbe'], orbc=res['orbc'])
+moe = res['orbe']
+co_data = MoDiaData(molecule=mol, moe=moe, orbc=res['orbc'])
+# we make here a small adjustment to the height of the 5σ orbital to avoid
+# overlap with the 2x2π MO
+moe[6] += 0.1
+co_data.set_moe(moe)
 diagram = MoDia(co_data, draw_level_labels=True, level_labels_style='mo_ao',
-                mo_labels=['1σ', '2σ', '3σ', '4σ', '1π','1π', '5σ', '2π', '2π', '6σ'],
+                mo_labels=['1σ', '2σ', '3σ', '4σ', '1π', '1π', '5σ', '2π', '2π', '6σ'],
                 settings=settings)
 diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_co_canonical.svg"))
 
 # making diagram for localized orbitals
-co_data = MoDiaData(molecule=mol, moe=resfb['orbe'], orbc=resfb['orbc'])
+moe = resfb['orbe']
+co_data = MoDiaData(molecule=mol, moe=moe, orbc=resfb['orbc'])
+# we make here a small adjustment to the height of the third orbital to avoid
+# overlap with the triple degenerate state of the localized MOs of CO
+moe[2] -= 0.1
+co_data.set_moe(moe)
 diagram = MoDia(co_data, draw_level_labels=True, level_labels_style='mo_ao',
                 mo_labels=[[]] * len(resfb['orbe']), settings=settings)
 diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_co_localized.svg"))

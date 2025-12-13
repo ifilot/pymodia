@@ -890,7 +890,7 @@ class MoDia():
         style = self.settings.energy_scale_style
         labels = self.settings.energy_scale_labels
 
-        moe = self.data.moe
+        moe = self.data.moe_labels
         aoe1 = self.data.atom1.e
         aoe2 = self.data.atom2.e
         nr_a1 = self.data.atom1.nr
