@@ -1,3 +1,27 @@
+"""
+This script generates molecular orbital (MO) diagrams for methane (CH₄)
+based on a Hartree-Fock (HF) calculation performed with PyQInt using a
+STO-3G basis set.
+
+Two MO diagrams are produced:
+  1. The canonical Hartree-Fock molecular orbitals, labeled by irreducible
+     representations of the T_d point group.
+  2. Foster-Boys localized molecular orbitals derived from the HF solution,
+     highlighting the C-H bonding picture.
+
+The workflow is:
+  - Build the CH₄ molecular structure automatically.
+  - Perform a restricted Hartree-Fock calculation.
+  - Automatically construct MoDia molecule and fragment objects from the
+    PyQInt results.
+  - Customize orbital colors and labels to emphasize symmetry and bonding.
+  - Generate and export SVG MO diagrams using MoDia for both canonical and
+    localized orbitals.
+
+The resulting diagrams illustrate the relationship between symmetry-adapted
+canonical orbitals and chemically intuitive localized orbitals in methane.
+"""
+
 import os
 from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, subscript, MoDiaSettings
 from pyqint import MoleculeBuilder, HF, FosterBoys

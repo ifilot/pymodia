@@ -1,3 +1,20 @@
+"""
+This script generates a molecular orbital (MO) diagram for the hydrogen
+molecule (H₂) based on a Hartree–Fock (HF) calculation performed with PyQInt
+using a STO-3G basis set.
+
+The workflow is:
+  - Build the H₂ molecular structure automatically.
+  - Perform a restricted Hartree–Fock calculation.
+  - Automatically construct MoDia molecule and fragment objects from the
+    PyQInt results.
+  - Generate and export an SVG molecular orbital diagram using MoDia.
+
+The resulting diagram illustrates the formation of bonding (σ) and
+antibonding (σ*) molecular orbitals from hydrogen 1s atomic orbitals and
+serves as a minimal example of MO diagram construction with MoDia.
+"""
+
 import os
 from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, MoDiaSettings, subscript
 from pyqint import MoleculeBuilder, HF

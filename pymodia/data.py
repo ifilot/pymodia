@@ -1,9 +1,36 @@
+from typing import Any
+from .molecule import MoDiaMolecule
+from .fragment import MoDiaFragment
+
 class MoDiaData():
     """
     Class that combines the data to make the molecular orbital diagram
     """
+    def __init__(
+        self,
+        molecule: MoDiaMolecule,
+        fragment1: MoDiaFragment,
+        fragment2: MoDiaFragment,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initialize a MoDia data container.
 
-    def __init__(self, molecule, fragment1, fragment2, **kwargs):
+        Parameters
+        ----------
+        molecule
+            The molecule object containing molecular orbital energies,
+            coefficients, and electron count.
+        fragment1
+            First molecular fragment (e.g. atom or group of atoms).
+        fragment2
+            Second molecular fragment.
+        **kwargs
+            Optional keyword arguments used to customize internal behavior
+            or override default settings.
+        """
+        ...
+
 
         allowed_data = {'name', 'moe', 'orbc'}
         self.__dict__.update((k, v) for k, v in kwargs.items()
@@ -12,7 +39,6 @@ class MoDiaData():
         self.molecule = molecule
         self.fragment1 = fragment1
         self.fragment2 = fragment2
-        self.name = 'namelabel'
 
         # When loading the molecular orbital (MO) energies, a copy is made of the
         # raw energies and used to set the energy labels. The user can now

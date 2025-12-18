@@ -1,20 +1,19 @@
-# PyMODIA
-
 ![Build status](https://gitlab.tue.nl/inorganic-materials-chemistry/pymodia/badges/master/pipeline.svg)
+
+# PyMODIA
 
 ## Purpose
 
 PyMoDia is a python package designed for making SVG images of 
 [molecular orbital diagrams](https://en.wikipedia.org/wiki/Molecular_orbital_diagram) 
-based on atomic orbital energies, molecular orbital energies and orbital coefficients.
-These energies and coefficients can either be obtained by using electronic structure 
-calculation or be assumed to giving rise to qualatative diagrams.
+based on atomic orbital energies, molecular orbital energies and orbital
+coefficients. These energies and coefficients can either be obtained by using
+electronic structure calculation or be assumed to giving rise to qualitative
+diagrams.
 
 This package makes use of the [drawsvg](https://github.com/cduck/drawsvg) package 
 to produce the SVG images. SVG images are vector based meaning that they are 
 great for digital purposes.
-
-PyMoDia was made with educational purposes in mind but can also work as a visualiser in general.
 
 ## Documentation
 
@@ -31,7 +30,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install PyMODIA via
+Install PyMoDia via
 
 ```bash
 pip install -e .
@@ -46,12 +45,6 @@ installing `pyqint` and `pydft` to run the majority of the examples.
 ```bash
 pip install pyqint pydft
 ```
-
-## Features
-
-* Highly customisable
-* Qualitative MO diagrams
-* Quantatative MO diagrams
 
 ## Gallery
 

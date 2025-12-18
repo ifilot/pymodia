@@ -1,10 +1,10 @@
 """
 This script generates molecular orbital (MO) energy-level diagrams for
-ethylene based on a Hartree–Fock (HF) calculation performed with PyQInt.
+ethylene based on a Hartree-Fock (HF) calculation performed with PyQInt.
 
 Two MO diagrams are produced:
   1. Canonical HF molecular orbitals.
-  2. Foster–Boys localized molecular orbitals derived from the HF solution.
+  2. Foster-Boys localized molecular orbitals derived from the HF solution.
 
 The workflow is:
   - Perform an RHF calculation for ethylene using a STO-3G basis.

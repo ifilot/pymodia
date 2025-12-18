@@ -1,3 +1,21 @@
+"""
+This script generates a molecular orbital (MO) diagram for the nitrogen
+molecule (N₂) based on an ab initio Hartree–Fock calculation performed with
+PyQInt.
+
+The workflow is:
+  - Define the N₂ molecular geometry at a fixed internuclear separation.
+  - Perform a geometry optimization and retrieve the resulting electronic
+    structure data using a STO-3G basis.
+  - Automatically construct MoDia molecule and fragment objects from the
+    PyQInt results.
+  - Customize diagram appearance using MoDia settings.
+  - Generate and export an SVG molecular orbital diagram using MoDia.
+
+The resulting diagram visualizes the canonical Hartree–Fock molecular orbitals
+of N₂, showing the energetic ordering and atomic-orbital contributions.
+"""
+
 import os
 from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, MoDiaSettings, subscript
 from pyqint import GeometryOptimization, FosterBoys, Molecule

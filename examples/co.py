@@ -1,3 +1,28 @@
+"""
+This script generates molecular orbital (MO) diagrams for carbon monoxide (CO)
+based on Hartree-Fock (HF) calculations performed with PyQInt using a STO-3G
+basis set.
+
+Two MO diagrams are produced:
+  1. Canonical Hartree-Fock molecular orbitals, labeled according to σ and π
+     symmetry.
+  2. Foster-Boys localized molecular orbitals derived from the HF solution,
+     illustrating the bonding and lone-pair character of CO.
+
+The workflow is:
+  - Build the CO molecular structure automatically.
+  - Perform a restricted Hartree-Fock calculation.
+  - Automatically construct MoDia molecule and fragment objects from the
+    PyQInt results.
+  - Apply small manual adjustments to selected orbital energies to avoid
+    overlapping levels in the rendered diagrams.
+  - Generate and export SVG MO diagrams using MoDia for both canonical and
+    localized orbitals.
+
+The resulting diagrams provide complementary symmetry-based and
+chemically intuitive views of the electronic structure of CO.
+"""
+
 import os
 from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, MoDiaSettings
 from pyqint import MoleculeBuilder, HF, FosterBoys

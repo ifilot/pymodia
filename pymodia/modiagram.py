@@ -1,14 +1,38 @@
 import drawsvg as draw
 import numpy as np
 import os
-from . import MoDiaSettings
 
-class MoDia():
+from typing import Any, Optional
+from .data import MoDiaData
+from .settings import MoDiaSettings
+
+class MoDia:
     """
-    Class to draw Molecular Orbital diagrams
+    Class responsible for constructing and rendering molecular orbital (MO)
+    diagrams using MoDia data containers and visualization settings.
     """
 
-    def __init__(self, data, **kwargs):
+    def __init__(
+        self,
+        data: MoDiaData,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initialize an MO diagram.
+
+        Parameters
+        ----------
+        data
+            MoDiaData object containing molecular and fragment information
+            required to construct the MO diagram.
+        settings
+            Optional MoDiaSettings object controlling visual appearance
+            (colors, cutoffs, rounding, etc.). If not provided, default
+            settings are used.
+        **kwargs
+            Additional keyword arguments used to override specific diagram
+            options or settings at initialization time.
+        """
 
         # import data object
         if data:
