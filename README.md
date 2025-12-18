@@ -1,4 +1,7 @@
 [![CI](https://github.com/ifilot/pymodia/actions/workflows/ci.yml/badge.svg)](https://github.com/ifilot/pymodia/actions/workflows/ci.yml)
+[![PyPI pkg](https://github.com/ifilot/pymodia/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/ifilot/pymodia/actions/workflows/build_wheels.yml)
+[![PyPI](https://img.shields.io/pypi/v/pymodia?style=flat-square)](https://pypi.org/project/pymodia/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # PyMODIA
 
