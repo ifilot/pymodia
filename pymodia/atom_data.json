@@ -8,7 +8,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "H"
     },
     "He": {
         "atom": "Helium",
@@ -19,7 +20,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "He"
     },
     "Li": {
         "atom": "Lithium",
@@ -31,7 +33,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Li"
     },
     "Be": {
         "atom": "Beryllium",
@@ -43,7 +46,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Be"
     },
     "B": {
         "atom": "Boron",
@@ -56,7 +60,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "B"
     },
     "C": {
         "atom": "Carbon",
@@ -73,7 +78,8 @@
             -0.43,
             -0.43,
             -0.43
-        ]
+        ],
+        "symbol" : "C"
     },
     "N": {
         "atom": "Nitrogen",
@@ -86,7 +92,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "N"
     },
     "O": {
         "atom": "Oxygen",
@@ -103,7 +110,8 @@
             -0.6,
             -0.6,
             -0.6
-        ]
+        ],
+        "symbol" : "O"
     },
     "F": {
         "atom": "Fluorine",
@@ -116,7 +124,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "F"
     },
     "Ne": {
         "atom": "Neon",
@@ -129,7 +138,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Ne"
     },
     "Na": {
         "atom": "Sodium",
@@ -143,7 +153,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Na"
     },
     "Mg": {
         "atom": "Magnesium",
@@ -157,7 +168,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Mg"
     },
     "Al": {
         "atom": "Aluminium",
@@ -172,7 +184,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Al"
     },
     "Si": {
         "atom": "Silicon",
@@ -187,7 +200,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Si"
     },
     "P": {
         "atom": "Phosphorus",
@@ -202,7 +216,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "P"
     },
     "S": {
         "atom": "Sulfur",
@@ -217,7 +232,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "S"
     },
     "Cl": {
         "atom": "Chlorine",
@@ -232,7 +248,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Cl"
     },
     "Ar": {
         "atom": "Argon",
@@ -247,7 +264,8 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "Ar"
     },
     "K": {
         "atom": "Potassium",
@@ -263,6 +281,7 @@
         ],
         "ao_energy": [
             -0.5
-        ]
+        ],
+        "symbol" : "K"
     }
 }

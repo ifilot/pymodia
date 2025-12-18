@@ -9,7 +9,6 @@ class MoDiaFragment():
     """
 
     def __init__(self, name, state_energies, nelec, bf_mapping, sublabel = None):
-
         self.state_energies = state_energies
         self.nelec = nelec
         self.name = name

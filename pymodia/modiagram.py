@@ -761,7 +761,6 @@ class MoDia():
                 if abs(orbc[i][j]) >= abs_cutoff:
                     if j in self.data.fragment1.bf_mapping.keys():
                         bf_id = self.data.fragment1.bf_mapping[j]
-                        print(j,bf_id)
                         p = draw.Line(ao1_loc['xe'][bf_id],
                                       ao1_loc['ye'][bf_id],
                                       mo_loc['xb'][i],

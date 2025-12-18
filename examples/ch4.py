@@ -1,17 +1,13 @@
 import os
-from pymodia import MoDia, MoDiaData, Atom, MoDiaMolecule, subscript, MoDiaSettings
+from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, subscript, MoDiaSettings
 from pyqint import MoleculeBuilder, HF, FosterBoys
 
 # Perform PyQInt calculations for CO and its localization
 mol = MoleculeBuilder().from_name('ch4')
 res = HF().rhf(mol, 'sto3g')
-resfb = FosterBoys(res).run()
 
-# Setting up MoDia objects
-C = Atom("C")
-H = Atom("H")
-mol_name = subscript("CH4")
-mol = MoDiaMolecule(mol_name, C, 1, H, 4)
+# attempt to automatically create mol and fragments from calculation
+mol, f1, f2 = autobuild_from_pyqint(res, name=subscript('CH4'))
 
 # adjust settings
 settings = MoDiaSettings()
@@ -25,8 +21,8 @@ settings.ao1_color = ['#000000', '#f58742', '#5e2ca3', '#5e2ca3', '#5e2ca3']
 settings.ao2_color = ['#f58742']
 
 # making diagram for canonical orbitals
-ch4_data = MoDiaData(molecule=mol, moe=res['orbe'], orbc=res['orbc'])
-diagram = MoDia(ch4_data, draw_level_labels=True, level_labels_style='mo_ao',
+data = MoDiaData(mol, f1, f2)
+diagram = MoDia(data, draw_level_labels=True, level_labels_style='mo_ao',
                 mo_labels=['1A'+subscript('1'), 
                            '2A'+subscript('1'),
                            '1T'+subscript('2'), 
@@ -45,7 +41,10 @@ settings.ao1_color = ['#000000', '#f58742', '#5e2ca3', '#5e2ca3', '#5e2ca3']
 settings.ao2_color = ['#f58742']
 
 # making diagram for localized orbitals
-ch4_data = MoDiaData(molecule=mol, moe=resfb['orbe'], orbc=resfb['orbc'])
-diagram = MoDia(ch4_data, draw_level_labels=True, level_labels_style='mo_ao',
+resfb = FosterBoys(res).run()
+resfb['nuclei'] = res['nuclei'] # no longer required from PyQInt >= 1.2.0
+mol, f1, f2 = autobuild_from_pyqint(resfb, name=subscript('CH4'))
+data = MoDiaData(mol, f1, f2)
+diagram = MoDia(data, draw_level_labels=True, level_labels_style='mo_ao',
                 mo_labels=[[]] * len(resfb['orbe']), settings=settings)
 diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_ch4_localized.svg"))
