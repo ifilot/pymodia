@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymodia"
-version = "0.3.0"
+version = "0.5.0"
 authors = [
-  { name="Ivo Filot", email="ivo@ivofilot.nl" }
+    { name="Ivo Filot", email="ivo@ivofilot.nl" }
 ]
 maintainers = [
     { name="Ivo Filot", email="ivo@ivofilot.nl" },
@@ -23,6 +23,7 @@ dependencies = [
     "matplotlib",
     "numpy",
     "drawsvg",
+    "cairosvg",
 ]
 
 [tool.setuptools.packages.find]

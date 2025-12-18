@@ -14,7 +14,7 @@ class MoDiaData():
                              if k in allowed_data)
 
         if 'molecule' in kwargs:
-            self.set_molecule(kwargs['molecule'])
+            self.__set_molecule(kwargs['molecule'])
 
         # When loading the molecular orbital (MO) energies, a copy is made of the
         # raw energies and used to set the energy labels. The user can now
@@ -77,7 +77,7 @@ class MoDiaData():
 
         return self
 
-    def set_molecule(self, molecule):
+    def __set_molecule(self, molecule):
         """
         Set the molecule data based on a MoDiaMolecule object
 
@@ -90,19 +90,19 @@ class MoDiaData():
 
         self.name = molecule.name
 
-        self.atom1 = Empty()
-        self.atom1.name = molecule.atom1.name
-        self.atom1.e = molecule.atom1.e
-        self.atom1.nr = molecule.atom1.nr
-        self.atom1.atomic_number = molecule.atom1.atomic_number
-        self.atom1.configuration = molecule.atom1.configuration
+        self.fragment1 = Empty()
+        self.fragment1.name = molecule.fragment1.name
+        self.fragment1.e = molecule.fragment1.e
+        self.fragment1.nr = molecule.fragment1.nr
+        self.fragment1.atomic_number = molecule.fragment1.atomic_number
+        self.fragment1.configuration = molecule.fragment1.configuration
 
-        self.atom2 = Empty()
-        self.atom2.name = molecule.atom2.name
-        self.atom2.e = molecule.atom2.e
-        self.atom2.nr = molecule.atom2.nr
-        self.atom2.atomic_number = molecule.atom2.atomic_number
-        self.atom2.configuration = molecule.atom2.configuration
+        self.fragment2 = Empty()
+        self.fragment2.name = molecule.fragment2.name
+        self.fragment2.e = molecule.fragment2.e
+        self.fragment2.nr = molecule.fragment2.nr
+        self.fragment2.atomic_number = molecule.fragment2.atomic_number
+        self.fragment2.configuration = molecule.fragment2.configuration
 
         return self
 
@@ -116,6 +116,7 @@ class MoDiaData():
             file path to json file with data
 
         """
+        pass
 
     def save_json(self, path):
         """
@@ -127,3 +128,4 @@ class MoDiaData():
             path to save json file to
 
         """
+        pass
