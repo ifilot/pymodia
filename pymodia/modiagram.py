@@ -145,6 +145,7 @@ class MoDia():
         mo_core = self.__mo_core
         ao1_core = self.__ao1_core
         ao2_core = self.__ao2_core
+        core_energies = mo_core + ao1_core + ao2_core
 
         mo_outer = self.__mo_outer
         ao1_outer = self.__ao1_outer
@@ -152,26 +153,22 @@ class MoDia():
 
         # Notifying user
         if nr_a1 >= 2 and self.data.fragment1.name != "H":
-            print('Number of atoms 1 >= 2, only one set of atomic orbtials is '
-                  'drawn')
+            print('Number of fragments 1 >= 2, only one set of atomic orbtials is drawn')
         if nr_a2 >= 2 and self.data.fragment2.name != "H":
-            print('Number of atoms 2 >= 2, only one set of atomic orbtials is '
-                  'drawn')
+            print('Number of fragments 2 >= 2, only one set of atomic orbtials is drawn')
 
-        # Finding lowest core orbital
-        if len(mo_core) >= 1:
-            lwst = []
-            if mo_core:
-                lwst_mo_c = min(mo_core)
-                lwst.append(lwst_mo_c)
-            if ao1_core:
-                lwst_ao1_c = min(ao1_core)
-                lwst.append(lwst_ao1_c)
-            if ao2_core:
-                lwst_ao2_c = min(ao2_core)
-                lwst.append(lwst_ao2_c)
-            if lwst[0]:
-                lwst_core = min(lwst)
+        
+        # core scaling
+        emin = min(core_energies)
+        emax = max(core_energies)
+        
+          # prevent collapse for nearly-degenerate cores
+        if abs(emax - emin) < 1e-6:
+            emax = emin + 1e-6
+        
+        def scale_core(e):
+            return (e - emin) / (emax - emin) * core_height
+        
 
         # Finding lowest outer orbital
         lwst_mo_o = min(mo_outer)
@@ -187,27 +184,17 @@ class MoDia():
         # Molecular orbitals
         ro_mo_outer = [x+abs(lwst_outer) for x in mo_outer]
         s_mo_outer = [x/(max(ro_mo_outer)) * outer_height for x in ro_mo_outer]
-        if len(mo_core) == 1:
-            ro_mo_core = [abs(x) for x in mo_core]
-            s_mo_core = [x/(max(ro_mo_core)) * 0.5 * core_height for x in
-                         ro_mo_core]
-        else:
-            ro_mo_core = [x+abs(lwst_core) for x in mo_core]
-            s_mo_core = [x/(max(ro_mo_core)) * core_height for x in ro_mo_core]
+        
+        s_mo_core  = [scale_core(e) for e in mo_core]
+
 
         # Atomic orbitals
         # Atomic orbital 1
         ro_ao1_outer = [x+abs(lwst_outer) for x in ao1_outer]
         s_ao1_outer = [x/(max(ro_mo_outer)) * outer_height for x in
                        ro_ao1_outer]
-        if len(mo_core) == 1:
-            ro_ao1_core = [abs(x) for x in ao1_core]
-            s_ao1_core = [x/(max(ro_mo_core)) * 0.5 * core_height for x in
-                          ro_ao1_core]
-        else:
-            ro_ao1_core = [x+abs(lwst_core) for x in ao1_core]
-            s_ao1_core = [x/(max(ro_mo_core)) * core_height for x in
-                          ro_ao1_core]
+                       
+        s_ao1_core = [scale_core(e) for e in ao1_core]
 
         if nr_a1 > 1:
             s_ao1_core = s_ao1_core*nr_a1
@@ -217,14 +204,8 @@ class MoDia():
         ro_ao2_outer = [x+abs(lwst_outer) for x in ao2_outer]
         s_ao2_outer = [x/(max(ro_mo_outer)) * outer_height for x in
                        ro_ao2_outer]
-        if len(mo_core) == 1:
-            ro_ao2_core = [abs(x) for x in ao2_core]
-            s_ao2_core = [x/(max(ro_mo_core)) * 0.5 * core_height for x in
-                          ro_ao2_core]
-        else:
-            ro_ao2_core = [x+abs(lwst_core) for x in ao2_core]
-            s_ao2_core = [x/(max(ro_mo_core)) * core_height for x in
-                          ro_ao2_core]
+                       
+        s_ao2_core = [scale_core(e) for e in ao2_core]
 
         if nr_a2 > 1:
             s_ao2_core = s_ao2_core*nr_a2
@@ -255,6 +236,7 @@ class MoDia():
         self.__mo_loc = mo_loc
         self.__ao1_loc = ao1_loc
         self.__ao2_loc = ao2_loc
+
 
     def __location_dictonary(self, loct_dict, s_orbe, column, h0):
         """

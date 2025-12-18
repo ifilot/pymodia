@@ -11,6 +11,7 @@ def main():
     settings = MoDiaSettings()
     settings.orbc_color = '#555555'
     settings.arrow_color = '#CC0000'
+    settings.mo_round = 2
     settings.ao_round = 2
     settings.orbc_cutoff = 0.2
     settings.ao1_labels = [''] * len(res['orbe']) # custom basis, do not label
