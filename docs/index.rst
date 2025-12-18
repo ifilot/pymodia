@@ -4,24 +4,31 @@
 
 =======
 
-:program:`PyMoDia` is a python package used for visualising 
-:ref:`molecular orbital diagrams <background>`.
-It can be used to make `svg images <https://en.wikipedia.org/wiki/SVG>`_ using the `drawsvg <https://github.com/cduck/drawsvg>`_ package.
+:program:`PyMoDia` is primarily intended for educational use.
+Its main purpose is to produce clear and intuitive visualizations of molecular
+orbital structures that can be used in teaching and learning environments.
+Educators can perform electronic structure calculations and subsequently use
+:program:`PyMoDia` to generate illustrative figures or student exercises.
 
-:program:`PyMoDia` can be used for educational purposes.
-This package's main use is to produce visualizations which can be used for teaching.
-Educators can perform electronic structure calculations and use :program:`PyMoDia` to produce clear visualizations or exercises for their students.
-Besides using qualitative results, users can also produce more qualitative diagrams.
+In addition to qualitative, textbook-style diagrams,
+:program:`PyMoDia` can be coupled to quantum-chemical Python packages to
+visualize results obtained from *ab initio* electronic structure calculations.
+At present, the direct construction of molecular orbital diagrams from
+quantum-chemical calculations is supported exclusively through
+`PyQInt <https://github.com/ifilot/pyqint>`_.
+This approach is intended for use with **minimal basis sets**, where a clear
+one-to-one correspondence between atomic orbitals and molecular orbitals can
+be established, allowing meaningful AO-MO level connections to be visualized.
 
-:program:`PyMoDia` can be easily coupled to quantum mechanical python packages to produce qualitative molecular orbital diagrams.
-More on this can be seen in :ref:`examples <examples>`.
+Several examples demonstrating this workflow are provided in the
+:ref:`examples <examples>` section.
 
-.. figure:: _static/img/MO_diagram_H2.svg
+.. figure:: _static/img/mo_co_canonical.svg
    :align: center
    :width: 600
    :alt: simple H2 molecular orbital diagram
 
-   Molecular orbital diagram of hydrogen. Script used to make this image can be found in :ref:`example <examples>`
+   Molecular orbital diagram of CO. Script used to make this image can be found in :ref:`example <examples>`
 
 :program:`PyMoDia` has been developed at the Eindhoven University of Technology, Netherlands.
 
@@ -30,9 +37,8 @@ More on this can be seen in :ref:`examples <examples>`.
    :caption: Contents:
 
    installation
-   background
+   usage
    examples
-   user_interface
    community_guidelines
 
 Indices and tables
