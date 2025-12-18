@@ -1,4 +1,4 @@
-![Build status](https://gitlab.tue.nl/inorganic-materials-chemistry/pymodia/badges/master/pipeline.svg)
+[![CI](https://github.com/ifilot/pymodia/actions/workflows/ci.yml/badge.svg)](https://github.com/ifilot/pymodia/actions/workflows/ci.yml)
 
 # PyMODIA
 
