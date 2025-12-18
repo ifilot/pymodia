@@ -7,14 +7,16 @@ class MoDiaData():
     Class that combines the data to make the molecular orbital diagram
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, molecule, fragment1, fragment2, **kwargs):
 
         allowed_data = {'name', 'moe', 'orbc'}
         self.__dict__.update((k, v) for k, v in kwargs.items()
                              if k in allowed_data)
 
-        if 'molecule' in kwargs:
-            self.__set_molecule(kwargs['molecule'])
+        self.molecule = molecule
+        self.fragment1 = fragment1
+        self.fragment2 = fragment2
+        self.name = 'namelabel'
 
         # When loading the molecular orbital (MO) energies, a copy is made of the
         # raw energies and used to set the energy labels. The user can now
@@ -22,8 +24,7 @@ class MoDiaData():
         # MOs are being plotted, but will conserve the energies. This allows
         # the user to make small adjustment to the energy levels to avoid
         # any form of overlapping.
-        if hasattr(self, "moe"):
-            self.moe_labels = [float(e) for e in self.moe]
+        self.moe_labels = [float(e) for e in self.molecule.state_energies]
 
     def set_ao_energy(self, atom_index, energies):
         """
@@ -74,35 +75,6 @@ class MoDiaData():
             List of MO energies
         """
         self.moe = moe
-
-        return self
-
-    def __set_molecule(self, molecule):
-        """
-        Set the molecule data based on a MoDiaMolecule object
-
-        Parameters
-        ----------
-        molecule
-            molecule diagram molecule object
-
-        """
-
-        self.name = molecule.name
-
-        self.fragment1 = Empty()
-        self.fragment1.name = molecule.fragment1.name
-        self.fragment1.e = molecule.fragment1.e
-        self.fragment1.nr = molecule.fragment1.nr
-        self.fragment1.atomic_number = molecule.fragment1.atomic_number
-        self.fragment1.configuration = molecule.fragment1.configuration
-
-        self.fragment2 = Empty()
-        self.fragment2.name = molecule.fragment2.name
-        self.fragment2.e = molecule.fragment2.e
-        self.fragment2.nr = molecule.fragment2.nr
-        self.fragment2.atomic_number = molecule.fragment2.atomic_number
-        self.fragment2.configuration = molecule.fragment2.configuration
 
         return self
 

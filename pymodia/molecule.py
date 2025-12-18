@@ -7,6 +7,8 @@ class MoDiaMolecule():
     MO diagram
     """
 
-    def __init__(self, name, energies):
+    def __init__(self, name, state_energies, state_coefficients, nr_elec):
         self.name = name
-        self.energies = energies
+        self.state_energies = state_energies
+        self.state_coefficients = state_coefficients
+        self.nelec = nr_elec

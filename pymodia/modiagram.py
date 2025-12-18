@@ -32,11 +32,11 @@ class MoDia():
 
         # rounding energies
         self.data.moe = [round(moe, self.settings.mo_round) for moe
-                         in self.data.moe]
+                         in self.data.molecule.state_energies]
         self.data.fragment1.e = [round(e, self.settings.ao_round) for e
-                                 in self.data.fragment1.e]
+                                 in self.data.fragment1.state_energies]
         self.data.fragment2.e = [round(e, self.settings.ao_round) for e
-                                 in self.data.fragment2.e]
+                                 in self.data.fragment2.state_energies]
 
     def draw(self):
         """
@@ -72,7 +72,7 @@ class MoDia():
         # adding atom/molecule information at bottom diagram
         self.__draw_names()
         if self.settings.draw_configuration:
-            self.__draw_configuration()
+            self.__draw_sublabel()
 
         # add box around core orbitals
         if self.settings.draw_core_box:
@@ -140,8 +140,8 @@ class MoDia():
         core_height = self.settings.core_height
         margin = self.settings.margin
 
-        nr_a1 = self.data.fragment1.nr
-        nr_a2 = self.data.fragment2.nr
+        nr_a1 = 1
+        nr_a2 = 1
 
         mo_core = self.__mo_core
         ao1_core = self.__ao1_core
@@ -266,8 +266,8 @@ class MoDia():
         margin = self.settings.margin
         multiplicty_offset = self.settings.multiplicty_offset
 
-        nr_a1 = self.data.fragment1.nr
-        nr_a2 = self.data.fragment2.nr
+        nr_a1 = 1
+        nr_a2 = 1
 
         if column == 'mo':
             orbe_x_start = [0.5*width + 0.5*margin - 0.5*level_width for x in
@@ -447,11 +447,11 @@ class MoDia():
         """
         Adds atom and molecules names/labels
         """
-        name_mol = self.data.name
+        name_mol = self.data.molecule.name
         name_a1 = self.data.fragment1.name
         name_a2 = self.data.fragment2.name
-        nr_a1 = self.data.fragment1.nr
-        nr_a2 = self.data.fragment2.nr
+        nr_a1 = 1
+        nr_a2 = 1
 
         height = self.settings.height
         width = self.settings.width
@@ -486,13 +486,10 @@ class MoDia():
             name_mol, names_font_size, (0.5*width + 0.5*margin),
             (height - 0.5*margin), center=True, fill=color))
 
-    def __draw_configuration(self, configuration_font_size=12):
+    def __draw_sublabel(self, configuration_font_size=12):
         """
         Adds configuration of atoms to diagram
         """
-        config_a1 = self.data.fragment1.configuration
-        config_a2 = self.data.fragment2.configuration
-
         height = self.settings.height
         width = self.settings.width
         margin = self.settings.margin
@@ -500,16 +497,19 @@ class MoDia():
 
         color = self.settings.name_color
 
-        self.image.append(draw.Text(config_a1,
-                                    configuration_font_size,
-                                    (2*margin + 0.5 * level_width),
-                                    (height - 0.25*margin),
-                                    center=True, fill=color))
-        self.image.append(draw.Text(config_a2,
-                                    configuration_font_size,
-                                    (width - (margin + 0.5*level_width)),
-                                    (height - 0.25*margin),
-                                    center=True, fill=color))
+        if self.data.fragment1.sublabel is not None:
+            self.image.append(draw.Text(self.data.fragment1.sublabel,
+                                        configuration_font_size,
+                                        (2*margin + 0.5 * level_width),
+                                        (height - 0.25*margin),
+                                        center=True, fill=color))
+        
+        if self.data.fragment2.sublabel is not None:
+            self.image.append(draw.Text(self.data.fragment2.sublabel,
+                                        configuration_font_size,
+                                        (width - (margin + 0.5*level_width)),
+                                        (height - 0.25*margin),
+                                        center=True, fill=color))
 
     def __draw_box(self):
         """
@@ -537,10 +537,8 @@ class MoDia():
         """
         Draws the occupancy of energy levels with either arrow symbols
         """
-        anr_a1 = self.data.fragment1.atomic_number
-        anr_a2 = self.data.fragment2.atomic_number
-        nr_a1 = self.data.fragment1.nr
-        nr_a2 = self.data.fragment2.nr
+        nr_a1 = 1
+        nr_a2 = 1
 
         ao1_loc = self.__ao1_loc
         ao2_loc = self.__ao2_loc
@@ -561,17 +559,9 @@ class MoDia():
         self.__arrow = arrow
 
         # Drawing the occupancies
-        if nr_a1 >= 2 and self.data.fragment1.name != "H":
-            ao1_e_count = anr_a1
-        else:
-            ao1_e_count = anr_a1 * nr_a1
-
-        if nr_a2 >= 2 and self.data.fragment2.name != "H":
-            ao2_e_count = anr_a2
-        else:
-            ao2_e_count = anr_a2 * nr_a2
-
-        mo_e_count = anr_a1 * nr_a1 + anr_a2 * nr_a2
+        ao1_e_count = self.data.fragment1.nelec
+        ao2_e_count = self.data.fragment2.nelec
+        mo_e_count = self.data.molecule.nelec
 
         # atom 1 levels
         for e in range(len(ao1_loc['ye'])):
@@ -615,8 +605,9 @@ class MoDia():
         for e in range(len(mo_loc['ye'])):
             nr_levels = mo_loc['ye'].count(mo_loc['ye'][e])
             if ((mo_loc['ye'][e] == mo_loc['yme'][e]) or
-                (mo_loc['ye'][e] ==
-                 (mo_loc['yme'][e]-0.5*multiplicty_offset))):
+                (mo_loc['ye'][e] == (mo_loc['yme'][e]-0.5*multiplicty_offset))):
+
+                # determine how many electrons need to be placed
                 if mo_e_count >= 2*nr_levels:
                     nr_e = 2*nr_levels
                 else:
@@ -624,7 +615,7 @@ class MoDia():
 
                 self.__draw_occupancy((0.5*width+0.5*margin),
                                       mo_loc['ye'][e], nr_e, nr_levels)
-                mo_e_count = mo_e_count - nr_e
+                mo_e_count -= nr_e
 
     def __draw_occupancy(self, level_loc_x, level_loc_y, nr_elec, nr_levels):
         """
@@ -758,7 +749,7 @@ class MoDia():
         color = self.settings.orbc_color
         font_size = self.settings.orbc_font_size
 
-        orbc = np.transpose(self.data.orbc)
+        orbc = np.transpose(self.data.molecule.state_coefficients)
         ao1_loc = self.__ao1_loc
         ao2_loc = self.__ao2_loc
         mo_loc = self.__mo_loc
@@ -768,13 +759,11 @@ class MoDia():
         for i in range(len(orbc[0])):
             for j in range(len(orbc[0])):
                 if abs(orbc[i][j]) >= abs_cutoff:
-
-                    ao1_end_index = len(ao1_loc['xb'])-1
-                    ao1_len = len(ao1_loc['xb'])
-
-                    if (j <= ao1_end_index):
-                        p = draw.Line(ao1_loc['xe'][j],
-                                      ao1_loc['ye'][j],
+                    if j in self.data.fragment1.bf_mapping.keys():
+                        bf_id = self.data.fragment1.bf_mapping[j]
+                        print(j,bf_id)
+                        p = draw.Line(ao1_loc['xe'][bf_id],
+                                      ao1_loc['ye'][bf_id],
                                       mo_loc['xb'][i],
                                       mo_loc['yb'][i], stroke=color,
                                       fill_opacity=opacity,
@@ -784,8 +773,7 @@ class MoDia():
                             self.image.append(p)
 
                         if print_coeff is True:
-                            str_coeffs = [str(round(c, 2))
-                                          for c in orbc[i]]
+                            str_coeffs = [str(round(c, 2)) for c in orbc[i]]
                             if path_memory.count(p) == 1:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
@@ -806,11 +794,12 @@ class MoDia():
                                     str_coeffs[j], font_size, path=p,
                                     text_anchor='middle',
                                     line_offset=-1.4, fill=color))
-                    elif (j > ao1_end_index):
+                    elif j in self.data.fragment2.bf_mapping.keys():
+                        bf_id = self.data.fragment2.bf_mapping[j]
                         p = draw.Line(mo_loc['xe'][i],
                                       mo_loc['ye'][i],
-                                      ao2_loc['xb'][j-ao1_len],
-                                      ao2_loc['yb'][j-ao1_len],
+                                      ao2_loc['xb'][bf_id],
+                                      ao2_loc['yb'][bf_id],
                                       stroke=color, fill_opacity=opacity,
                                       stroke_dasharray=linestyle)
                         path_memory.append(p)
@@ -818,8 +807,7 @@ class MoDia():
                             self.image.append(p)
 
                         if print_coeff is True:
-                            str_coeffs = [str(round(c, 2))
-                                          for c in orbc[i]]
+                            str_coeffs = [str(round(c, 2)) for c in orbc[i]]
                             if path_memory.count(p) == 1:
                                 self.image.append(draw.Text(
                                     str_coeffs[j], font_size, path=p,
@@ -891,10 +879,10 @@ class MoDia():
         labels = self.settings.energy_scale_labels
 
         moe = self.data.moe_labels
-        aoe1 = self.data.fragment1.e
-        aoe2 = self.data.fragment2.e
-        nr_a1 = self.data.fragment1.nr
-        nr_a2 = self.data.fragment2.nr
+        aoe1 = self.data.fragment1.nelec
+        aoe2 = self.data.fragment2.nelec
+        nr_a1 = 1
+        nr_a2 = 1
 
         mo_loc = self.__mo_loc
         ao1_loc = self.__ao1_loc
@@ -1039,7 +1027,7 @@ class MoDia():
         """
         Adds labels to atomic orbitals of atom 1
         """
-        nr_a1 = self.data.fragment1.nr
+        nr_a1 = 1
         ao1_loc = self.__ao1_loc
         font_size = self.settings.font_size
         color = self.settings.main_color
@@ -1062,7 +1050,7 @@ class MoDia():
         """
         Adds labels to atomic orbitals of atom 2
         """
-        nr_a2 = self.data.fragment2.nr
+        nr_a2 = 1
         ao2_loc = self.__ao2_loc
         font_size = self.settings.font_size
         color = self.settings.main_color

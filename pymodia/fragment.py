@@ -8,7 +8,11 @@ class MoDiaFragment():
     Creates atom instances to plug into the molecule class
     """
 
-    def __init__(self, labels, energy_levels):
+    def __init__(self, name, state_energies, nelec, bf_mapping, sublabel = None):
 
-        self.labels = labels
-        self.energies = energy_levels
+        self.state_energies = state_energies
+        self.nelec = nelec
+        self.name = name
+        self.sublabel = sublabel
+        self.atomic_number = 1
+        self.bf_mapping = bf_mapping
