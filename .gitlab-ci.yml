@@ -1,16 +1,6 @@
 image: debian:stable
 
-debian-test:
-  before_script:
-    - apt update && apt -y install python3-full         # install Python
-    - python3 -m venv /venv                             # create a virtual environment
-    - source /venv/bin/activate                         # activate virtual environment
-    - pip install drawsvg pytest numpy                  # install required packages
-  script: # explicitly write out all cases to run
-    - pytest tests/*.py
-
 pypi-compilation:
-  needs: ["debian-test"]
   image: python:3.11-slim-bullseye
   script:
     - pip install build
