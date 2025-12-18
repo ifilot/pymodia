@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  docs:
     name: Build and Deploy Sphinx Documentation
     runs-on: ubuntu-latest
 
