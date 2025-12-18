@@ -18,7 +18,7 @@ great for digital purposes.
 ## Documentation
 
 PyMoDia comes with detailed documentation and examples, which can be found
-at https://pymodia.imc-tue.nl.
+at https://ifilot.github.io/pymodia/.
 
 ## Installation
 
