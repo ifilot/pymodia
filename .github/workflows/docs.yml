@@ -8,31 +8,39 @@ on:
 
 jobs:
   docs:
-    name: Build and Deploy Sphinx Documentation
+    name: Build Sphinx documentation
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.13.1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install sphinx-rtd-theme \
-              sphinxcontrib-tikz \
-              pydata-sphinx-theme \
-              sphinx_design \
-              sphinx_subfigure \
-              myst_parser
-    - name: Build Documentation
-      run: |
-        cd docs
-        make html
+      - name: Install documentation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            sphinx \
+            sphinx-rtd-theme \
+            pydata-sphinx-theme \
+            sphinx_design \
+            myst_parser \
+            sphinxcontrib-tikz \
+            sphinx_subfigure
+
+      - name: Build documentation
+        run: |
+          make -C docs html
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-html
+          path: docs/_build/html
 
   pages:
     name: Deploy to GitHub Pages
