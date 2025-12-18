@@ -157,18 +157,17 @@ class MoDia():
         if nr_a2 >= 2 and self.data.fragment2.name != "H":
             print('Number of fragments 2 >= 2, only one set of atomic orbtials is drawn')
 
-        
         # core scaling
-        emin = min(core_energies)
-        emax = max(core_energies)
-        
-          # prevent collapse for nearly-degenerate cores
-        if abs(emax - emin) < 1e-6:
-            emax = emin + 1e-6
+        if len(core_energies) > 0:
+            emin = min(core_energies)
+            emax = max(core_energies)
+            
+            # prevent collapse for nearly-degenerate cores
+            if abs(emax - emin) < 1e-6:
+                emax = emin + 1e-6
         
         def scale_core(e):
             return (e - emin) / (emax - emin) * core_height
-        
 
         # Finding lowest outer orbital
         lwst_mo_o = min(mo_outer)
@@ -178,17 +177,16 @@ class MoDia():
 
         # Finding locations of outer levels
         height_0_outer = outer_height + margin
-        height_0_core = (core_height + outer_height + 2*margin)
+        height_0_core = (core_height + outer_height + 2 * margin)
 
         # reordering (ro) and scaling (s) orbital levels
         # Molecular orbitals
         ro_mo_outer = [x+abs(lwst_outer) for x in mo_outer]
         s_mo_outer = [x/(max(ro_mo_outer)) * outer_height for x in ro_mo_outer]
-        
         s_mo_core  = [scale_core(e) for e in mo_core]
 
-
         # Atomic orbitals
+        # ---------------
         # Atomic orbital 1
         ro_ao1_outer = [x+abs(lwst_outer) for x in ao1_outer]
         s_ao1_outer = [x/(max(ro_mo_outer)) * outer_height for x in

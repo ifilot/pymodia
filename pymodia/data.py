@@ -70,7 +70,7 @@ class MoDiaData():
         moe : lst
             List of MO energies
         """
-        self.moe = moe
+        self.molecule.state_energies = moe
 
         return self
 

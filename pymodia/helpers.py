@@ -11,6 +11,11 @@ def autobuild_from_pyqint(res, name=None):
     atoms, idx = np.unique([n[1] for n in res['nuclei']], return_index=True)
     atoms = atoms[np.argsort(idx)]
     
+    # sneaky hack to handle homonuclear diatomic molecules
+    if len(atoms) == 1 and len(res['nuclei']) == 2:
+        atoms = [atoms[0],-1]
+        res['nuclei'][1][1] = -1
+
     if len(atoms) != 2:
         raise Exception('Cannot autobuild from molecule with more than 2 distinct elements.')
 
@@ -57,12 +62,16 @@ def autobuild_from_pyqint(res, name=None):
 
                 break
     
+    # in the case of homonuclear system, unspoof the second atom
+    if atoms[1] == -1:
+        res['nuclei'][1][1] = res['nuclei'][0][1]
+
     # fragment 1
     el = find_by_atomic_number(atoms[0])
     f1 = MoDiaFragment(el['symbol'], el['ao_energy'], el['atomic_number'], mapping[atoms[0]], sublabel=superscript(el['configuration']))
                        
     # fragment 2
-    el = find_by_atomic_number(atoms[1])
+    el = find_by_atomic_number(atoms[1] if atoms[1] != -1 else atoms[0]) # needed for homonuclear diatomic molecules
     f2 = MoDiaFragment(el['symbol'], el['ao_energy'], el['atomic_number'], mapping[atoms[1]], sublabel=superscript(el['configuration']))
 
     # molecule

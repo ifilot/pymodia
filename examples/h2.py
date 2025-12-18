@@ -1,31 +1,23 @@
 import os
-import sys
+from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, MoDiaSettings, subscript
+from pyqint import MoleculeBuilder, HF
 
-# MO data
-mo_energies = [-0.58, 0.67]
-orbc = [[-0.55, -0.55], [1.21, -1.21]]
+# Perform PyQInt calculations for CO and its localization
+mol = MoleculeBuilder().from_name('h2')
+res = HF().rhf(mol, 'sto3g')
 
-#
-# Setting up PyMoDia objects
-#
+# adjust settings
+settings = MoDiaSettings()
+settings.orbc_color = '#555555'
+settings.arrow_color = '#CC0000'
 
-# build fragment from name and levels
-h = MoDiaFragment("H", [-0.08])
+# attempt to automatically create mol and fragments from calculation
+mol, f1, f2 = autobuild_from_pyqint(res, name=subscript('H2'))
 
-# build molecule name
-mol_name = subscript("H2")
+# build data object
+data = MoDiaData(mol, f1, f2)
 
-# build molecule and specify fragments
-mol = MoDiaMolecule(mol_name, mo_energies, orbc)
-
-# build diagram
-h2 = MoDiaData(mol, h, h)
-
-diagram = MoDia(h2, outer_height=200, core_height=20, height=320,
-                mo_color=['#1aa7ec', '#1aa7ec'], draw_orbc=True,
-                mo_labels=['σ', 'σ*'], draw_level_labels=True,
-                level_labels_style='mo')
-
-# Save image
-diagram.export_svg(os.path.join(
-    os.path.dirname(__file__), "H2_mo_diagram.svg"))
+diagram = MoDia(data, draw_level_labels=True, level_labels_style='mo_ao',
+                mo_labels=['1σ', '2σ*'],
+                settings=settings)
+diagram.export_svg(os.path.join(os.path.dirname(__file__), "mo_h2.svg"))

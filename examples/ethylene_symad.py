@@ -1,7 +1,36 @@
+"""
+This script constructs a molecular orbital (MO) energy-level diagram for
+ethylene based on a Hartree-Fock (HF) calculation performed in a
+symmetry-adapted atomic orbital basis.
+
+The workflow is as follows:
+  1. Perform a restricted Hartree-Fock (RHF) calculation for ethylene using
+     PyQInt and a STO-3G basis.
+  2. Construct an unnormalized symmetry-adapted basis by linearly combining
+     the original atomic orbitals according to ethylene's point-group
+     symmetry.
+  3. Reorder the symmetry-adapted basis such that orbitals belonging to the
+     same irreducible representation are consecutive, yielding block-diagonal
+     overlap and Fock matrices (not further used in this script)
+  4. Renormalize the symmetry-adapted basis functions and recompute the HF
+     solution in this new basis.
+  5. Automatically partition the resulting orbitals into fragments and
+     generate a molecular orbital diagram using MoDia, with orbitals grouped
+     and labeled by symmetry.
+
+The final output is an SVG molecular orbital diagram visualizing the
+symmetry-adapted HF solution for ethylene.
+
+Note:
+  This script requires PyQInt >= 1.2.0.
+"""
+
 import os
 from pymodia import MoDia, MoDiaData, MoDiaSettings, MoDiaFragment, MoDiaMolecule
 from pyqint import MoleculeBuilder, HF, PyQInt, CGF, GTO
 import numpy as np
+from packaging.version import Version; 
+import importlib.metadata as m;
 
 def main():
     # Perform PyQInt calculations for CO and its localization
@@ -13,7 +42,7 @@ def main():
     settings.arrow_color = '#CC0000'
     settings.mo_round = 2
     settings.ao_round = 2
-    settings.orbc_cutoff = 0.2
+    settings.orbc_cutoff = 0.3
     settings.ao1_labels = [''] * len(res['orbe']) # custom basis, do not label
     settings.ao2_labels = [''] * len(res['orbe']) # custom basis, do not label
 
@@ -22,13 +51,12 @@ def main():
 
     ao1_idx = np.array([0,1,2,4,5,6,8,9,10,12], dtype=np.int64)
     ao1_idx = ao1_idx[np.argsort([ao_energies[i] for i in ao1_idx])]
-    print([ao_energies[i] for i in ao1_idx])
-    f1 = MoDiaFragment('C', [ao_energies[i] for i in ao1_idx], 
+    f1 = MoDiaFragment('2xC', [ao_energies[i] for i in ao1_idx], 
                        12, {j:i for i,j in enumerate(ao1_idx)})
 
     ao2_idx = np.array([3,7,11,13], dtype=np.int64)
     ao2_idx = ao2_idx[np.argsort([ao_energies[i] for i in ao2_idx])]
-    f2 = MoDiaFragment('H', [ao_energies[i] for i in ao2_idx], 
+    f2 = MoDiaFragment('4xH', [ao_energies[i] for i in ao2_idx], 
                        4, {j:i for i,j in enumerate(ao2_idx)})
 
     mol = MoDiaMolecule('ethylene', res['orbe'], res['orbc'], res['nelec'])
@@ -48,6 +76,9 @@ def build_symads():
     Build symmetry-adapted basis for ethylene and use it to solve ethylene's
     electronic structure problem
     """
+    # this function requires PyQInt version 1.2.0 or newer
+    assert Version(m.version("pyqint")) >= Version("1.2.0")
+
     mol = MoleculeBuilder().from_name('ethylene')
     cgfs, nuclei = mol.build_basis('sto3g')
     res = HF().rhf(mol, 'sto3g')
@@ -139,7 +170,7 @@ def build_symads():
             g.c /= np.sqrt(S)
 
     # recalculate ethylene molecule using the new symmetry-adapted basis
-    res = HF().rhf(mol, cgfs_symad, verbose=True)
+    res = HF().rhf(mol, cgfs_symad)
 
     return res
 

@@ -1,8 +1,6 @@
 import os
 from pymodia import MoDia, MoDiaData, autobuild_from_pyqint, MoDiaSettings
 from pyqint import MoleculeBuilder, HF, FosterBoys
-import numpy as np
-import json
 
 # Perform PyQInt calculations for CO and its localization
 mol = MoleculeBuilder().from_name('co')
