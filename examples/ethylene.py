@@ -11,7 +11,8 @@ settings = MoDiaSettings()
 settings.orbc_color = '#555555'
 settings.arrow_color = '#CC0000'
 settings.ao_round = 2
-settings.orbc_cutoff = 0.1
+settings.mo_round = 2
+settings.orbc_cutoff = 0.2
 
 # attempt to automatically create mol and fragments from calculation
 mol, f1, f2 = autobuild_from_pyqint(res, name='ethylene')

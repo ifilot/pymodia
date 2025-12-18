@@ -1,12 +1,12 @@
 import numpy as np
 import os, json
-from . import MoDiaFragment, MoDiaMolecule, superscript
+from .fragment import MoDiaFragment
+from .molecule import MoDiaMolecule
 
 def autobuild_from_pyqint(res, name=None):
     """
     Try to auto-build Molecule and Fragments from results object
     """
-
     # grab atoms
     atoms, idx = np.unique([n[1] for n in res['nuclei']], return_index=True)
     atoms = atoms[np.argsort(idx)]
@@ -69,3 +69,31 @@ def autobuild_from_pyqint(res, name=None):
     mol = MoDiaMolecule(name, res['orbe'], res['orbc'], res['nelec'])
 
     return mol, f1, f2
+
+def subscript(string_in):
+    """
+    Function to turn all numbers in string to subscript
+    """
+    SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    string_out = string_in.translate(SUB)
+
+    return string_out
+
+def superscript(string_in):
+    """
+    Function to turn all numbers with ^in front in string to superscript
+    """
+    sup = False
+    string_out = ""
+    for element in string_in:
+        if sup == True:
+            SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+            sup_element = element.translate(SUP)
+            sup = False
+            string_out += sup_element
+        elif element == "^":
+            sup = True
+        else:
+            string_out += element
+
+    return string_out

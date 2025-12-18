@@ -1,7 +1,3 @@
-from . import Empty
-import numpy as np
-
-
 class MoDiaData():
     """
     Class that combines the data to make the molecular orbital diagram

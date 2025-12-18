@@ -1,8 +1,3 @@
-import os
-import json
-from . import superscript
-
-
 class MoDiaFragment():
     """
     Creates atom instances to plug into the molecule class
