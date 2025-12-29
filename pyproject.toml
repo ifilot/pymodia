@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymodia"
-version = "0.5.1"
+version = "0.5.2"
 description = "A Python package for constructing clear, educational molecular orbital diagrams from qualitative models or minimal-basis electronic structure calculations."
 readme = "README.md"
 requires-python = ">=3.9"
