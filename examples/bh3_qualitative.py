@@ -24,15 +24,15 @@ from pymodia import MoDia, MoDiaData, MoDiaMolecule, MoDiaFragment, subscript
 import os
 
 # MO data
-orbe = [-11, -3, -2, -2, 1, 2, 2, 3]
+orbe = [-11, -3, -2, -2, 0, 1, 2, 2]
 orbc = [[1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 1],
-        [0, 0, 1, 1, 0, 1, 1, 0],
-        [0, 0, 1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 1],
-        [0, 0, 1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 1, 0, 1, 1, 0]]
+        [0, 1, 0, 0, 1, 00, 0, 0],
+        [0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 0, 0, 1, 0, 0, 1, 1]]
 
 # Setting up PyMoDia objects
 mol_name = subscript("BH3")
@@ -41,8 +41,8 @@ b = MoDiaFragment('B', [-11, -1.5, 0, 0, 1], 5, {i:i for i in range(5)})
 h = MoDiaFragment('H', [-2,0,0], 3, {i+5:i for i in range(3)}, '3x1s')
 data = MoDiaData(mol, b, h)
 
-mo_colors = ["#000000", "#1260CC", "#FE6E00", "#FE6E00", "#FE00D4",
-             "#FE6E00", "#FE6E00", "#1260CC"]
+mo_colors = ["#000000", "#1260CC", "#FE6E00", "#FE6E00", "#1260CC",
+             "#FE00D4", "#FE6E00", "#FE6E00"]
 ao_colors1 = ["#000000", "#1260CC", "#FE6E00", "#FE6E00", "#FE00D4"]
 ao_colors2 = ["#1260CC", "#FE6E00", "#FE6E00"]
 mo_labels = ['A1\'(1)', 'A1\'(2)', 'E\'(1)', 'E\'(1)', 'A2\'\'(1)', 'E\'(2)*', 'E\'(2)*', 'A1\'(3)*']
